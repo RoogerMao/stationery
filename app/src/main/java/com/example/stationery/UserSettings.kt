@@ -12,6 +12,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerIcon.Companion.Text
@@ -19,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.*
 
 @Composable
 fun UserSettingsScreen() {
@@ -27,6 +29,7 @@ fun UserSettingsScreen() {
     ) {
         UserProfile()
         UserSettingsSwitches()
+        InfoChangeScreen()
     }
 }
 
@@ -79,6 +82,64 @@ fun UserSettingsSwitches() {
         SwitchSetting(stringResource(id = R.string.toggle_summaries_label))
     }
 }
+
+
+@Composable
+fun InfoChangeScreen(userSettingsViewModel: UserSettingsViewModel = viewModel()) {
+    val userSettings by UserSettingsViewModel.userSettings.collectAsState()
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        InfoChange(
+            username = stringResource(id = userSettings.usernameID),
+            profileImageId = userSettings.imageID,
+            onUsernameChange = { newUsernameId -> userSettingsViewModel.updateUsername(newUsernameId) },
+            onProfileImageChange = { newImageId ->
+                userSettingsViewModel.updateProfileImage(
+                    newImageId
+                )
+            }
+        )
+    }
+}
+
+@Composable
+fun InfoChange(
+    username: String,
+    profileImageId: Int,
+    onUsernameChange: (Int) -> Unit,
+    onProfileImageChange: (Int) -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box {
+            Image(
+                painter = painterResource(id = profileImageId),
+                contentDescription = null
+            )
+        }
+        Text(
+            text = username,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Button(onClick = {
+            // logic for updating username goes here
+        }) {
+            Text("Change Username")
+        }
+
+        Button(onClick = {
+            // logic for updating profile picture goes here
+        }) {
+            Text("Change Profile Picture")
+        }
+    }
+}
+
+
 
 @Preview(showBackground = true)
 @Composable
