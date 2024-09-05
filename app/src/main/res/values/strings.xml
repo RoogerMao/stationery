@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Stationery</string>
     <string name="default_username">User</string>
+    <string name="toggle_insights_label">Display Insights in Search</string>
+    <string name="toggle_summaries_label">Display Summaries in Documents</string>
+    <string name="change_profile_photo_button_content_description">Change Profile Photo</string>
 </resources>
