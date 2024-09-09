@@ -20,10 +20,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             StationeryTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    UserSettingsScreen(modifier = Modifier.padding(innerPadding))
                 }
             }
         }

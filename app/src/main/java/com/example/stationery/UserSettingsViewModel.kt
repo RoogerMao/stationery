@@ -5,16 +5,33 @@ import com.example.stationery.data.UserSettings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 class UserSettingsViewModel : ViewModel() {
-    private val _userSettings = MutableStateFlow(UserSettings())
-    val userSettings: StateFlow<UserSettings> = _userSettings.asStateFlow()
+    private val _userSettingsUIState = MutableStateFlow(UserSettings())
+    val userSettingsUIState: StateFlow<UserSettings> = _userSettingsUIState.asStateFlow()
 
     fun updateUsername(newUsername: Int) {
-        _userSettings.value = _userSettings.value.copy(usernameID = newUsername)
+        _userSettingsUIState.value = _userSettingsUIState.value.copy(usernameID = newUsername)
     }
 
     fun updateProfileImage(newImageId: Int) {
-        _userSettings.value = _userSettings.value.copy(imageID = newImageId)
+        _userSettingsUIState.value = _userSettingsUIState.value.copy(imageID = newImageId)
+    }
+
+    fun toggleInsightDisplay() {
+        _userSettingsUIState.update { currentState ->
+            currentState.copy(
+                displayInsights = !currentState.displayInsights
+            )
+        }
+    }
+
+    fun toggleSummaryDisplay() {
+        _userSettingsUIState.update { currentState ->
+            currentState.copy(
+                displaySummaries = !currentState.displaySummaries
+            )
+        }
     }
 }
