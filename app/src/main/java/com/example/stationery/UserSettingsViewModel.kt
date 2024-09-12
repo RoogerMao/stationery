@@ -1,5 +1,9 @@
 package com.example.stationery
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.stationery.data.UserSettings
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -9,6 +13,10 @@ import kotlinx.coroutines.flow.update
 
 class UserSettingsViewModel : ViewModel() {
     private val _userSettingsUIState = MutableStateFlow(UserSettings())
+    var showEditUsernameDialog by mutableStateOf(false)
+        private set
+
+
     val userSettingsUIState: StateFlow<UserSettings> = _userSettingsUIState.asStateFlow()
 
     fun updateUsername(newUsername: Int) {
@@ -33,5 +41,13 @@ class UserSettingsViewModel : ViewModel() {
                 displaySummaries = !currentState.displaySummaries
             )
         }
+    }
+
+    fun onShowEditUsernameDialog() {
+        showEditUsernameDialog = true
+    }
+
+    fun onDismissEditUsernameDialog() {
+        showEditUsernameDialog = false
     }
 }
