@@ -1,6 +1,5 @@
-package com.example.stationery
+package com.example.stationery.ui.screens
 
-import android.app.AlertDialog
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,24 +10,31 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.stationery.R
+import com.example.stationery.logic.model.UserSettingsViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserSettingsScreen(
     userSettingsViewModel: UserSettingsViewModel = viewModel(),
@@ -48,13 +54,39 @@ fun UserSettingsScreen(
     }
 
     if(userSettingsViewModel.showEditUsernameDialog) {
-        val editUsernameBuilder = AlertDialog.Builder(LocalContext.current)
-        editUsernameBuilder
-            .setTitle("Change username")
-            // TO DO MAKE A VIEW TO GET TEXTFIELD, then use setView()
-
-        val editUsernameDialog = editUsernameBuilder.create()
-        editUsernameDialog.show()
+        Dialog(
+            onDismissRequest = { userSettingsViewModel.onDismissEditUsernameDialog() }
+        ) {
+            Card {
+                Column {
+                    TextField(
+                        value = userSettingsUIState.newUsername,
+                        onValueChange = { userSettingsViewModel.editNewUsername(it) },
+                        label = {
+                            Text(
+                                text = stringResource(id = R.string.edit_username)
+                            )
+                        }
+                    )
+                    Row (
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ){
+                        Button(
+                            onClick = { userSettingsViewModel.onDismissEditUsernameDialog() },
+                            content = {
+                                Text(text = "Dismiss")
+                            }
+                        )
+                        Button(
+                            onClick = { userSettingsViewModel.onConfirmEditUsernameDialog(userSettingsUIState.newUsername) },
+                            content = {
+                                Text(text = "Confirm")
+                            }
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -69,12 +101,6 @@ fun UserProfile(
             Image(
                 painter = painterResource(id = R.drawable.default_profile_photo),
                 contentDescription = null
-            )
-            Button(
-                onClick = {},
-                content = {
-
-                }
             )
         }
         Row (

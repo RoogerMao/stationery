@@ -1,8 +1,7 @@
-package com.example.stationery
+package com.example.stationery.logic.model
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.stationery.data.UserSettings
@@ -16,12 +15,7 @@ class UserSettingsViewModel : ViewModel() {
     var showEditUsernameDialog by mutableStateOf(false)
         private set
 
-
     val userSettingsUIState: StateFlow<UserSettings> = _userSettingsUIState.asStateFlow()
-
-    fun updateUsername(newUsername: Int) {
-        _userSettingsUIState.value = _userSettingsUIState.value.copy(usernameID = newUsername)
-    }
 
     fun updateProfileImage(newImageId: Int) {
         _userSettingsUIState.value = _userSettingsUIState.value.copy(imageID = newImageId)
@@ -43,11 +37,34 @@ class UserSettingsViewModel : ViewModel() {
         }
     }
 
+    fun editNewUsername(editedNewUsername: String) {
+        _userSettingsUIState.update { currentState ->
+            currentState.copy(
+                newUsername = editedNewUsername
+            )
+        }
+    }
+
     fun onShowEditUsernameDialog() {
         showEditUsernameDialog = true
     }
 
     fun onDismissEditUsernameDialog() {
         showEditUsernameDialog = false
+        _userSettingsUIState.update { currentState ->
+            currentState.copy(
+                newUsername = ""
+            )
+        }
+    }
+
+    fun onConfirmEditUsernameDialog(finalNewUsername: String) {
+        showEditUsernameDialog = false
+        _userSettingsUIState.update { currentState ->
+            currentState.copy(
+                username = finalNewUsername,
+                newUsername = ""
+            )
+        }
     }
 }
