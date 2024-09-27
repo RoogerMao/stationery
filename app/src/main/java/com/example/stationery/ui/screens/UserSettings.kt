@@ -24,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -42,9 +43,12 @@ fun UserSettingsScreen(
 ) {
     val userSettingsUIState by userSettingsViewModel.userSettingsUIState.collectAsState()
     Column (
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize()
     ) {
-        UserProfile(userSettingsViewModel)
+        UserProfile(
+            userSettingsViewModel = userSettingsViewModel,
+            username = userSettingsUIState.username
+        )
         UserSettingsSwitches(
             displaySummaries = userSettingsUIState.displaySummaries,
             toggleDisplaySummaries = { userSettingsViewModel.toggleSummaryDisplay() },
@@ -92,24 +96,24 @@ fun UserSettingsScreen(
 
 @Composable
 fun UserProfile(
-    userSettingsViewModel: UserSettingsViewModel
+    userSettingsViewModel: UserSettingsViewModel,
+    username: String
 ) {
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
-        Box {
-            Image(
-                painter = painterResource(id = R.drawable.default_profile_photo),
-                contentDescription = null
-            )
-        }
+        Image(
+            painter = painterResource(id = R.drawable.default_profile_photo),
+            contentDescription = null,
+            modifier = Modifier.fillMaxWidth()
+        )
         Row (
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxWidth()
         ){
             Text(
-                text = stringResource(id = R.string.default_username),
+                text = username,
                 textAlign = TextAlign.Center
             )
             Spacer(
