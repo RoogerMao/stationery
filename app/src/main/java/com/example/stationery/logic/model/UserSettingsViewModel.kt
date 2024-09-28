@@ -1,5 +1,6 @@
 package com.example.stationery.logic.model
 
+import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -15,10 +16,12 @@ class UserSettingsViewModel : ViewModel() {
     var showEditUsernameDialog by mutableStateOf(false)
         private set
 
+
+
     val userSettingsUIState: StateFlow<UserSettings> = _userSettingsUIState.asStateFlow()
 
-    fun updateProfileImage(newImageId: Int) {
-        _userSettingsUIState.value = _userSettingsUIState.value.copy(imageID = newImageId)
+    fun updateProfileImage(newImageId: Uri?) {
+        _userSettingsUIState.value = _userSettingsUIState.value.copy(imageID = newImageId.hashCode())
     }
 
     fun toggleInsightDisplay() {

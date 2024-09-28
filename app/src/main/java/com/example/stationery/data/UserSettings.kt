@@ -1,6 +1,6 @@
 package com.example.stationery.data
 
-import androidx.compose.ui.res.stringResource
+import android.net.Uri
 import com.example.stationery.R
 
 data class UserSettings(
