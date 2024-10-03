@@ -5,4 +5,5 @@
     <string name="toggle_summaries_label">Display Summaries in Documents</string>
     <string name="change_profile_photo_button_content_description">Change Profile Photo</string>
     <string name="edit_username">Edit Username</string>
+    <string name="add_sticky">Create a New Sticky</string>
 </resources>
