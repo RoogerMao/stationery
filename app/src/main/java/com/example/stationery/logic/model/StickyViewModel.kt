@@ -9,15 +9,16 @@ import com.example.stationery.data.Sticky
 import okhttp3.internal.readFieldOrNull
 
 class StickyViewModel(private val stickiesRepository: OfflineStickiesRepository): ViewModel() {
-    var stickyUISTate by mutableStateOf(StickyUIState())
+    var stickyUIState by mutableStateOf(StickyUIState())
+        private set
+    var showStickyEditScreen by mutableStateOf(false)
         private set
 
     fun updateStickyUIState(newSticky: Sticky) {
-        stickyUISTate = StickyUIState(
+        stickyUIState = StickyUIState(
             sticky = Sticky(
                 title =  newSticky.title,
-                startDate = newSticky.startDate,
-                endDate = newSticky.endDate,
+                date = newSticky.date,
                 field = newSticky.field,
                 type = newSticky.type,
                 timeCommitted = newSticky.timeCommitted,
@@ -28,13 +29,20 @@ class StickyViewModel(private val stickiesRepository: OfflineStickiesRepository)
     }
 
     suspend fun saveSticky() {
-        if(validateSticky(stickyUISTate.sticky)) {
-            stickiesRepository.insertSticky(stickyUISTate.sticky)
+        if(validateSticky(stickyUIState.sticky)) {
+            stickiesRepository.insertSticky(stickyUIState.sticky)
         }
     }
 
     private fun validateSticky(newSticky: Sticky): Boolean {
-        return (newSticky.title != "") && (newSticky.endDate >= newSticky.startDate)
-                && (newSticky.field != null)
+        return (newSticky.title != "") && (newSticky.field != null)
+    }
+
+    fun onShowEditStickyDialog() {
+        showStickyEditScreen = true
+    }
+
+    fun onDismissEditStickyDialog() {
+        showStickyEditScreen = false
     }
 }
