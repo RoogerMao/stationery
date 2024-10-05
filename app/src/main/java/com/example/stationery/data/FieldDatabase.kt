@@ -19,8 +19,19 @@ abstract class FieldDatabase : RoomDatabase() {
                 Room.databaseBuilder(context, FieldDatabase::class.java, "field_database")
                     .fallbackToDestructiveMigrationFrom()
                     .build()
-                    .also { Instance = it }
+                    .also {
+                        Instance = it
+                    }
             }
+        }
+    }
+
+    suspend fun loadDefaultCareers() {
+        Field.defaultCareerList.sort()
+        Field.defaultCareerList.forEach { defaultCareer ->
+            Instance?.fieldDAO()?.insert(
+                Field(defaultCareer)
+            )
         }
     }
 }

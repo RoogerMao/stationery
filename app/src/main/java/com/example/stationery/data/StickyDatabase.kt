@@ -17,8 +17,9 @@ abstract class StickyDatabase: RoomDatabase() {
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(context, StickyDatabase::class.java, "sticky_database")
                     .fallbackToDestructiveMigrationFrom()
-                    .build()
-                    .also { Instance = it }
+                    .build().also {
+                        Instance = it
+                    }
             }
         }
     }
