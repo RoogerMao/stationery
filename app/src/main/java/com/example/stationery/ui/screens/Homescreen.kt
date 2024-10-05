@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -59,7 +60,9 @@ fun EditStickyDialog(
         onDismissRequest = { /*stickyViewModel.onDismissEditStickyDialog()*/ }
     ) {
         Card {
-            Column {
+            Column(
+                modifier = Modifier.padding(8.dp)
+            ) {
                 TextField(
                     value = "",
                     onValueChange = {},
@@ -67,7 +70,8 @@ fun EditStickyDialog(
                         Text(
                             text = "Name"
                         )
-                    }
+                    },
+                    modifier = Modifier.padding(bottom = 8.dp, start = 8.dp)
                 )
                 StickySetting(
                     painterResourceID = R.drawable.baseline_calendar_today_24,
@@ -100,8 +104,26 @@ fun EditStickyDialog(
                         Text(
                             text = "Time Committed"
                         )
-                    }
+                    },
+                    modifier = Modifier.padding(8.dp)
                 )
+                Row (
+                ) {
+                    TextButton(
+                        onClick = {},
+                        content = {
+                            Text(text = "Dismiss")
+                        },
+                        modifier = Modifier.weight(1F)
+                    )
+                    TextButton(
+                        onClick = {},
+                        content = {
+                            Text(text = "Confirm")
+                        },
+                        modifier = Modifier.weight(1F)
+                    )
+                }
             }
         }
     }
@@ -116,7 +138,10 @@ fun StickySetting(
 ) {
     val settingName = stringResource(id = settingNameResourceID)
 
-    Row {
+    Row (
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(8.dp)
+    ){
         Icon(
             painter = painterResource(painterResourceID),
             contentDescription = "Edit $settingName"
@@ -124,7 +149,7 @@ fun StickySetting(
         Spacer(
             modifier = Modifier.width(8.dp)
         )
-        Text(
+        Text( // make this bolded
             text = settingName
         )
         Spacer(
