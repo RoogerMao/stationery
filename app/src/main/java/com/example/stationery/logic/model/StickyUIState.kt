@@ -6,3 +6,4 @@ data class StickyUIState(
     val sticky: Sticky = Sticky(),
     val isStickyValid: Boolean = false
 )
+
