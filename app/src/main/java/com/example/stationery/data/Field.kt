@@ -2,11 +2,12 @@ package com.example.stationery.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.stationery.logic.model.FieldUIState
 
 @Entity(tableName = "fields")
 data class Field(
     @PrimaryKey(autoGenerate = true)
-    val field: String = ""
+    val fieldName: String = ""
 ) {
     companion object {
         val defaultCareerList: MutableList<String> = mutableListOf(
@@ -44,3 +45,8 @@ data class Field(
         )
     }
 }
+
+fun Field.fieldToFieldUIState(isFieldValid: Boolean = false): FieldUIState = FieldUIState(
+    field = this,
+    isFieldValid = isFieldValid
+)

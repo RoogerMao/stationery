@@ -32,3 +32,5 @@ enum class STICKY_TYPE {
 enum class INTEREST {
     LOW, MEDIUM, HIGH
 }
+
+
