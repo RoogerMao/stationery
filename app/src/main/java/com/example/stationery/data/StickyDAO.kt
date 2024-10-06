@@ -20,6 +20,8 @@ interface StickyDAO {
     suspend fun delete(sticky: Sticky)
 
     //get all stickies
-    @Query("SELECT * from stickies ORDER BY startDate ASC")
+    @Query("SELECT * from stickies ORDER BY date ASC")
     fun getAllStickies(): Flow<List<Sticky>>
+
+    //TO ADD MORE
 }

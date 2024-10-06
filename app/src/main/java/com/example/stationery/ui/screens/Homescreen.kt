@@ -28,12 +28,13 @@ import com.example.stationery.logic.model.StickyViewModel
 
 @Composable
 fun HomeScreen(
-    stickyViewModel: StickyViewModel = viewModel()
+    stickyViewModel: StickyViewModel = viewModel(),
+    modifier: Modifier = Modifier
 ) {
 
     Box(
         contentAlignment = Alignment.BottomEnd,
-        modifier = Modifier
+        modifier = modifier
             .padding(16.dp)
             .fillMaxSize()
     ) {
@@ -42,22 +43,22 @@ fun HomeScreen(
             painter = painterResource(id = R.drawable.baseline_add_24),
             contentDescription = stringResource(id = R.string.add_sticky),
             modifier = Modifier.clickable {
-
+                stickyViewModel.onShowEditStickyDialog()
             }
         )
     }
 
     if(stickyViewModel.showStickyEditScreen) {
-        EditStickyDialog(/*stickyViewModel*/)
+        EditStickyDialog(stickyViewModel)
     }
 }
 
 @Composable
 fun EditStickyDialog(
-    //stickyViewModel: StickyViewModel = viewModel()
+    stickyViewModel: StickyViewModel = viewModel()
 ) {
     Dialog(
-        onDismissRequest = { /*stickyViewModel.onDismissEditStickyDialog()*/ }
+        onDismissRequest = { stickyViewModel.onDismissEditStickyDialog() }
     ) {
         Card {
             Column(
@@ -107,17 +108,20 @@ fun EditStickyDialog(
                     },
                     modifier = Modifier.padding(8.dp)
                 )
-                Row (
-                ) {
+                Row {
                     TextButton(
-                        onClick = {},
+                        onClick = {
+                            stickyViewModel.onDismissEditStickyDialog()
+                        },
                         content = {
                             Text(text = "Dismiss")
                         },
                         modifier = Modifier.weight(1F)
                     )
                     TextButton(
-                        onClick = {},
+                        onClick = {
+                            stickyViewModel.onConfirmEditStickyDialog()
+                        },
                         content = {
                             Text(text = "Confirm")
                         },

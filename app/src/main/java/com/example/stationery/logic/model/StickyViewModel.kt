@@ -4,38 +4,58 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.example.stationery.data.INTEREST
 import com.example.stationery.data.OfflineStickiesRepository
+import com.example.stationery.data.STICKY_TYPE
 import com.example.stationery.data.Sticky
+import com.example.stationery.data.StickyDAO
+import com.example.stationery.ui.screens.StickySetting
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import okhttp3.internal.readFieldOrNull
+import java.time.LocalDate
 
-class StickyViewModel(private val stickiesRepository: OfflineStickiesRepository): ViewModel() {
-    var stickyUIState by mutableStateOf(StickyUIState())
-        private set
+class StickyViewModel(
+    private val stickyDAO: StickyDAO
+): ViewModel() {
+    private val _stickyUIState = MutableStateFlow(Sticky())
     var showStickyEditScreen by mutableStateOf(false)
         private set
 
-    fun updateStickyUIState(newSticky: Sticky) {
-        stickyUIState = StickyUIState(
-            sticky = Sticky(
-                title =  newSticky.title,
-                date = newSticky.date,
-                field = newSticky.field,
-                type = newSticky.type,
-                timeCommitted = newSticky.timeCommitted,
-                interest = newSticky.interest
-            ),
-            isStickyValid = validateSticky(newSticky)
-        )
+    // non-mutable one we expose to the UI
+    val stickyUIState: StateFlow<Sticky> = _stickyUIState.asStateFlow()
+
+    fun updateSticky(
+        //default values if not inputted
+        title: String = _stickyUIState.value.title,
+        date: String = _stickyUIState.value.date,
+        field: String = _stickyUIState.value.field,
+        type: STICKY_TYPE = _stickyUIState.value.type,
+        timeCommitted: Float? = _stickyUIState.value.timeCommitted,
+        interest: INTEREST? = _stickyUIState.value.interest
+    ) {
+        _stickyUIState.update { currentState ->
+            currentState.copy(
+                title = title,
+                date = date,
+                field = field,
+                type = type,
+                timeCommitted = timeCommitted,
+                interest = interest
+            )
+        }
     }
 
     suspend fun saveSticky() {
-        if(validateSticky(stickyUIState.sticky)) {
-            stickiesRepository.insertSticky(stickyUIState.sticky)
+        if(validateSticky(_stickyUIState.value)) {
+            stickyDAO.insert(_stickyUIState.value)
         }
     }
 
     private fun validateSticky(newSticky: Sticky): Boolean {
-        return (newSticky.title != "") && (newSticky.field != null)
+        return (newSticky.title != "")
     }
 
     fun onShowEditStickyDialog() {
@@ -43,6 +63,12 @@ class StickyViewModel(private val stickiesRepository: OfflineStickiesRepository)
     }
 
     fun onDismissEditStickyDialog() {
+        showStickyEditScreen = false
+    }
+
+    fun onConfirmEditStickyDialog() {
+        //TO DO
+
         showStickyEditScreen = false
     }
 }
