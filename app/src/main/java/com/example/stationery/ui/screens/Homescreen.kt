@@ -28,10 +28,9 @@ import com.example.stationery.logic.model.StickyViewModel
 
 @Composable
 fun HomeScreen(
-    stickyViewModel: StickyViewModel = viewModel(),
+    stickyViewModel: StickyViewModel,
     modifier: Modifier = Modifier
 ) {
-
     Box(
         contentAlignment = Alignment.BottomEnd,
         modifier = modifier
@@ -55,7 +54,7 @@ fun HomeScreen(
 
 @Composable
 fun EditStickyDialog(
-    stickyViewModel: StickyViewModel = viewModel()
+    stickyViewModel: StickyViewModel
 ) {
     Dialog(
         onDismissRequest = { stickyViewModel.onDismissEditStickyDialog() }
@@ -166,10 +165,4 @@ fun StickySetting(
             }
         )
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun StickyDialogPreview() {
-    EditStickyDialog()
 }

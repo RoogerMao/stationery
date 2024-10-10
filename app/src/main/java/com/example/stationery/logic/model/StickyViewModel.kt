@@ -5,20 +5,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.stationery.data.INTEREST
-import com.example.stationery.data.OfflineStickiesRepository
 import com.example.stationery.data.STICKY_TYPE
+import com.example.stationery.data.StickiesRepository
 import com.example.stationery.data.Sticky
 import com.example.stationery.data.StickyDAO
-import com.example.stationery.ui.screens.StickySetting
+import com.example.stationery.data.StickyDatabase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import okhttp3.internal.readFieldOrNull
-import java.time.LocalDate
 
 class StickyViewModel(
-    private val stickyDAO: StickyDAO
+    private val stickyDatabase: StickyDatabase
 ): ViewModel() {
     private val _stickyUIState = MutableStateFlow(Sticky())
     var showStickyEditScreen by mutableStateOf(false)
@@ -50,7 +48,7 @@ class StickyViewModel(
 
     suspend fun saveSticky() {
         if(validateSticky(_stickyUIState.value)) {
-            stickyDAO.insert(_stickyUIState.value)
+            stickyDatabase.stickyDAO().insert(_stickyUIState.value)
         }
     }
 

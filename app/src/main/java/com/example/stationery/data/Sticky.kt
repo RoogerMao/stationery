@@ -2,20 +2,41 @@ package com.example.stationery.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
-@Entity(tableName = "stickies")
-data class Sticky(
-    @PrimaryKey(autoGenerate = true)
+// the information we want to know for displaying the UI
+data class StickyUIState(
+    val stickyDetails: StickyDetails = StickyDetails(),
+    val isStickyValid: Boolean = false
+)
+
+
+// data needed for UI
+data class StickyDetails(
     val title: String = "",
     val date: String = LocalDate.now()
         .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)),
     val field: String = Sticky.defaultCareerList[0],
-    val type: STICKY_TYPE = STICKY_TYPE.RESEARCH,
-    val timeCommitted: Float? = null,
-    val interest: INTEREST? = null,
+    val type: String = STICKY_TYPE.RESEARCH.name,
+    val timeCommitted: Float = 0.0F,
+    val interest: String = INTEREST.HIGH.name
+)
+
+// the information we store in the database
+@Entity(tableName = "stickies")
+@TypeConverters(stickyConverters::class)
+data class Sticky(
+    @PrimaryKey(autoGenerate = true)
+    val title: String,
+    val date: String,
+    val field: String,
+    val type: STICKY_TYPE,
+    val timeCommitted: Float,
+    val interest: INTEREST,
 ) {
     companion object {
         val defaultCareerList: MutableList<String> = mutableListOf(
@@ -58,8 +79,53 @@ enum class STICKY_TYPE {
     RESEARCH, BENCHMARK, EXPERIENCE
 }
 
+class stickyConverters {
+    @TypeConverter
+    fun fromStickyType(stickyType: STICKY_TYPE): String {
+        return stickyType.name
+    }
+
+    @TypeConverter
+    fun toStickyType(stickyType: String): STICKY_TYPE {
+        return STICKY_TYPE.valueOf(stickyType)
+    }
+
+    @TypeConverter
+    fun fromStickyInterest(stickyInterest: INTEREST): String {
+        return stickyInterest.name
+    }
+
+    @TypeConverter
+    fun toStickyInterest(stickyInterest: String): INTEREST {
+        return INTEREST.valueOf(stickyInterest)
+    }
+}
+
 enum class INTEREST {
     LOW, MEDIUM, HIGH
 }
 
+// extension functions to convert between sticky UI class and sticky data class
+fun Sticky.toStickyDetails(): StickyDetails = StickyDetails(
+    title = title,
+    date = date,
+    field = field,
+    type = type.name,
+    timeCommitted = timeCommitted,
+    interest = interest.name
+)
+
+fun Sticky.toStickyUIState(isStickyValid: Boolean): StickyUIState = StickyUIState(
+    stickyDetails = this.toStickyDetails(),
+    isStickyValid = isStickyValid
+)
+
+fun StickyDetails.toSticky(): Sticky = Sticky(
+    title = title,
+    date = date,
+    field = field,
+    type = STICKY_TYPE.valueOf(type),
+    timeCommitted = timeCommitted,
+    interest = INTEREST.valueOf(interest)
+)
 
