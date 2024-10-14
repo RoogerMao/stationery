@@ -11,7 +11,7 @@ import java.time.format.FormatStyle
 // the information we want to know for displaying the UI
 data class StickyUIState(
     val stickyDetails: StickyDetails = StickyDetails(),
-    val isStickyValid: Boolean = false
+    val areStickyDetailsValid: Boolean = false
 )
 
 
@@ -115,9 +115,9 @@ fun Sticky.toStickyDetails(): StickyDetails = StickyDetails(
     interest = interest.name
 )
 
-fun Sticky.toStickyUIState(isStickyValid: Boolean): StickyUIState = StickyUIState(
+fun Sticky.toStickyUIState(areStickyDetailsValid: Boolean): StickyUIState = StickyUIState(
     stickyDetails = this.toStickyDetails(),
-    isStickyValid = isStickyValid
+    areStickyDetailsValid = areStickyDetailsValid
 )
 
 fun StickyDetails.toSticky(): Sticky = Sticky(

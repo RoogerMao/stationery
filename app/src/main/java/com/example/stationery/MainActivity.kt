@@ -1,4 +1,4 @@
-package com.example.stationery.ui.screens
+package com.example.stationery
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.stationery.data.StickyDatabase
 import com.example.stationery.logic.model.StickyViewModel
+import com.example.stationery.ui.screens.HomeScreen
 import com.example.stationery.ui.theme.StationeryTheme
 
 class MainActivity : ComponentActivity() {
