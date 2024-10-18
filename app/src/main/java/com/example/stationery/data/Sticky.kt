@@ -17,6 +17,7 @@ data class StickyUIState(
 
 // data needed for UI
 data class StickyDetails(
+    val id: Long = 0,
     val title: String = "",
     val date: String = LocalDate.now()
         .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)),
@@ -28,10 +29,10 @@ data class StickyDetails(
 
 // the information we store in the database
 @Entity(tableName = "stickies")
-@TypeConverters(stickyConverters::class)
+@TypeConverters(StickyConverters::class)
 data class Sticky(
-    @PrimaryKey(autoGenerate = true)
-    val title: String,
+    @PrimaryKey val id: Long = 0,
+    val title: String = "",
     val date: String,
     val field: String,
     val type: STICKY_TYPE,
@@ -39,7 +40,7 @@ data class Sticky(
     val interest: INTEREST,
 ) {
     companion object {
-        val defaultCareerList: MutableList<String> = mutableListOf(
+        val defaultCareerList: List<String> = listOf(
             "Food Products and Processing Systems", "Plant Systems", "Animal Systems",
             "Power, Structural, and Technical Systems", "Natural Resource Systems",
             "Environmental Service Systems", "Agribusiness Systems", "Design/Pre-Construction",
@@ -79,7 +80,7 @@ enum class STICKY_TYPE {
     RESEARCH, BENCHMARK, EXPERIENCE
 }
 
-class stickyConverters {
+class StickyConverters {
     @TypeConverter
     fun fromStickyType(stickyType: STICKY_TYPE): String {
         return stickyType.name
@@ -107,6 +108,7 @@ enum class INTEREST {
 
 // extension functions to convert between sticky UI class and sticky data class
 fun Sticky.toStickyDetails(): StickyDetails = StickyDetails(
+    id = id,
     title = title,
     date = date,
     field = field,
@@ -121,6 +123,7 @@ fun Sticky.toStickyUIState(areStickyDetailsValid: Boolean): StickyUIState = Stic
 )
 
 fun StickyDetails.toSticky(): Sticky = Sticky(
+    id = id,
     title = title,
     date = date,
     field = field,

@@ -11,13 +11,13 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface StickyDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(sticky: Sticky)
+    fun insert(sticky: Sticky)
 
     @Update
-    suspend fun update(sticky: Sticky)
+    fun update(sticky: Sticky)
 
     @Delete
-    suspend fun delete(sticky: Sticky)
+    fun delete(sticky: Sticky)
 
     //get all stickies
     @Query("SELECT * from stickies ORDER BY date ASC")
