@@ -25,7 +25,7 @@ class StickyViewModel(
     private val stickyRepository: StickiesRepository,
     private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
-    val _stickyUIState = MutableStateFlow(StickyUIState())
+    private val _stickyUIState = MutableStateFlow(StickyUIState())
     var showStickyEditScreen by mutableStateOf(false)
         private set
 
@@ -57,12 +57,6 @@ class StickyViewModel(
     }
 
     fun onDismissEditStickyDialog() {
-        showStickyEditScreen = false
-    }
-
-    fun onConfirmEditStickyDialog() {
-        //TO DO
-
         showStickyEditScreen = false
     }
 

@@ -23,7 +23,7 @@ data class StickyDetails(
         .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)),
     val field: String = Sticky.defaultCareerList[0],
     val type: String = STICKY_TYPE.RESEARCH.name,
-    val timeCommitted: Float = 0.0F,
+    val timeCommitted: String = "0.0",
     val interest: String = INTEREST.HIGH.name
 )
 
@@ -113,7 +113,7 @@ fun Sticky.toStickyDetails(): StickyDetails = StickyDetails(
     date = date,
     field = field,
     type = type.name,
-    timeCommitted = timeCommitted,
+    timeCommitted = timeCommitted.toString(),
     interest = interest.name
 )
 
@@ -128,7 +128,7 @@ fun StickyDetails.toSticky(): Sticky = Sticky(
     date = date,
     field = field,
     type = STICKY_TYPE.valueOf(type),
-    timeCommitted = timeCommitted,
+    timeCommitted = timeCommitted.toFloatOrNull() ?: 0.0F,
     interest = INTEREST.valueOf(interest)
 )
 
