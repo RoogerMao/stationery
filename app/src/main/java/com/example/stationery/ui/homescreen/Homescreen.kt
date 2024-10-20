@@ -77,9 +77,12 @@ fun HomeScreen(
             stickyFlow = stickyViewModel.stickyUIState,
             showDatePicker = stickyViewModel.showStickyDatePicker,
             showTypeDropdown = stickyViewModel.showTypeDropdown,
+            showInterestDropdown = stickyViewModel.showInterestDropdown,
             onToggleDatePicker = { stickyViewModel.onToggleStickyDatePicker() },
             onShowTypeDropdown = { stickyViewModel.onShowTypeDropdown() },
             onDismissTypeDropdown = { stickyViewModel.onDismissTypeDropdown() },
+            onShowInterestDropdown = { stickyViewModel.onShowInterestDropdown() },
+            onDismissInterestDropdown = { stickyViewModel.onDismissInterestDropdown() },
             onValueChange = { stickyViewModel.updateSticky(it) },
             onDismiss = { stickyViewModel.onDismissEditStickyDialog() },
             onSave = {
@@ -99,9 +102,12 @@ fun EditStickyDialog(
     stickyFlow: StateFlow<StickyUIState>,
     showDatePicker: Boolean,
     showTypeDropdown: Boolean,
+    showInterestDropdown: Boolean,
     onToggleDatePicker: () -> Unit,
     onShowTypeDropdown: () -> Unit,
     onDismissTypeDropdown: () -> Unit,
+    onShowInterestDropdown: () -> Unit,
+    onDismissInterestDropdown: () -> Unit,
     onValueChange: (StickyDetails) -> Unit,
     onDismiss: () -> Unit,
     onSave: () -> Unit,
@@ -118,6 +124,7 @@ fun EditStickyDialog(
             Column(
                 modifier = Modifier.padding(8.dp)
             ) {
+                // enter name of activity
                 TextField(
                     value = stickyUIState.stickyDetails.title,
                     onValueChange = {
@@ -161,7 +168,8 @@ fun EditStickyDialog(
 
                         //show date picker
                         onToggleDatePicker()
-                    }
+                    },
+                    modifier = Modifier.focusable()
                 )
 
                 // show date picker
@@ -178,6 +186,7 @@ fun EditStickyDialog(
                     onSettingValueClicked = {},
                 )
 
+                // setting to indicate experience type
                 StickyDropdownSetting(
                     painterResourceID = R.drawable.baseline_category_24,
                     settingNameResourceID = R.string.sticky_type,
@@ -205,12 +214,35 @@ fun EditStickyDialog(
                     }
                 )
 
-                StickySetting(
+                // setting for interest level
+                StickyDropdownSetting(
                     painterResourceID = R.drawable.baseline_thumb_up_24,
                     settingNameResourceID = R.string.sticky_interest,
-                    settingValue = "Medium",
-                    onSettingValueClicked = { }
+                    settingValue = stickyUIState.stickyDetails.interest,
+                    settingValueIconID = stickyUIState.stickyDetails.interestIconID,
+                    onShowSettingDropdown = onShowInterestDropdown,
+                    onDismissSettingDropdown = onDismissInterestDropdown,
+                    displaySettingDropdown = showInterestDropdown,
+                    dropdownSettingOptions = listOf(
+                        Pair("Low", R.drawable.baseline_signal_cellular_alt_1_bar_24),
+                        Pair("Medium", R.drawable.baseline_signal_cellular_alt_2_bar_24),
+                        Pair("High", R.drawable.baseline_signal_cellular_alt_24)
+                    ),
+                    onItemClick = {
+                        val newIconID = when(it) {
+                            "Low" -> R.drawable.baseline_signal_cellular_alt_1_bar_24
+                            "Medium" -> R.drawable.baseline_signal_cellular_alt_2_bar_24
+                            else -> R.drawable.baseline_signal_cellular_alt_24
+                        }
+
+                        onValueChange(stickyUIState.stickyDetails.copy(
+                            interest = it,
+                            interestIconID = newIconID
+                        ))
+                    }
                 )
+
+                // enter time committed
                 TextField(
                     value = stickyUIState.stickyDetails.timeCommitted,
                     onValueChange = {
@@ -227,6 +259,7 @@ fun EditStickyDialog(
                     ),
                     modifier = Modifier.padding(8.dp)
                 )
+
                 Row {
                     TextButton(
                         onClick = onDismiss,

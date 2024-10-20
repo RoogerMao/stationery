@@ -26,7 +26,8 @@ data class StickyDetails(
     val type: String = "Research",
     val typeIconID: Int = R.drawable.baseline_lightbulb_24,
     val timeCommitted: String = "0.0",
-    val interest: String = INTEREST.HIGH.name
+    val interest: String = INTEREST.MEDIUM.name,
+    val interestIconID: Int = R.drawable.baseline_signal_cellular_alt_2_bar_24
 )
 
 // the information we store in the database
