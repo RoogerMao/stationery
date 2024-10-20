@@ -13,15 +13,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -35,13 +36,17 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.stationery.R
-import com.example.stationery.data.Sticky
 import com.example.stationery.data.StickyDetails
 import com.example.stationery.data.StickyUIState
 import com.example.stationery.logic.model.StickyViewModel
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.Date
 
 @Composable
 fun HomeScreen(
@@ -69,6 +74,8 @@ fun HomeScreen(
     if(stickyViewModel.showStickyEditScreen) {
         EditStickyDialog(
             stickyFlow = stickyViewModel.stickyUIState,
+            showDatePicker = stickyViewModel.showStickyDatePicker,
+            onToggleDatePicker = { stickyViewModel.onToggleStickyDatePicker() },
             onValueChange = { stickyViewModel.updateSticky(it) },
             onDismiss = { stickyViewModel.onDismissEditStickyDialog() },
             onSave = {
@@ -82,16 +89,19 @@ fun HomeScreen(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun EditStickyDialog(
     stickyFlow: StateFlow<StickyUIState>,
+    showDatePicker: Boolean,
+    onToggleDatePicker: () -> Unit,
     onValueChange: (StickyDetails) -> Unit,
     onDismiss: () -> Unit,
     onSave: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier.focusable()
 ) {
     val stickyUIState by stickyFlow.collectAsState(initial = StickyUIState())
+    val datePickerState = rememberDatePickerState()
     val focusManager= LocalFocusManager.current
 
     Dialog(
@@ -116,17 +126,44 @@ fun EditStickyDialog(
                     ),
                     keyboardActions = KeyboardActions(
                         onNext = {
-                            // move focus to the date picker
+                            focusManager.moveFocus(FocusDirection.Next)
                         }
                     ),
                     modifier = Modifier.padding(bottom = 8.dp, start = 8.dp)
                 )
+
+                // expand the dialogue to include a calendar, add animations later
                 StickySetting(
                     painterResourceID = R.drawable.baseline_calendar_today_24,
                     settingNameResourceID = R.string.sticky_date,
-                    settingValue = "01/01/24",
-                    onSettingValueClicked = {}
+                    settingValue = stickyUIState.stickyDetails.date,
+                    onSettingValueClicked = {
+                        // save current datePicker information
+                        val dateSelected = Date(
+                            datePickerState.selectedDateMillis ?:
+                            LocalDate.now().atStartOfDay(ZoneId.of("UTC")).toInstant().toEpochMilli()
+                        )
+
+                        onValueChange(
+                            stickyUIState.stickyDetails.copy(
+                                date = LocalDateTime.ofInstant(dateSelected.toInstant(), ZoneId.of("UTC")).format(
+                                    DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
+                                )
+                            )
+                        )
+
+                        //show date picker
+                        onToggleDatePicker()
+                    }
                 )
+
+                // show date picker
+                if(showDatePicker) {
+                    DatePicker(
+                        state = datePickerState
+                    )
+                }
+
                 StickySetting(
                     painterResourceID = R.drawable.baseline_school_24,
                     settingNameResourceID = R.string.sticky_career_field,
@@ -143,7 +180,7 @@ fun EditStickyDialog(
                     painterResourceID = R.drawable.baseline_thumb_up_24,
                     settingNameResourceID = R.string.sticky_interest,
                     settingValue = "Medium",
-                    onSettingValueClicked = {}
+                    onSettingValueClicked = { onToggleDatePicker() }
                 )
                 TextField(
                     value = stickyUIState.stickyDetails.timeCommitted,
@@ -185,7 +222,8 @@ fun StickySetting(
     painterResourceID: Int,
     settingNameResourceID: Int,
     settingValue: String,
-    onSettingValueClicked: () -> Unit                       // what to display
+    onSettingValueClicked: () -> Unit,                       // what to display
+    modifier: Modifier = Modifier
 ) {
     val settingName = stringResource(id = settingNameResourceID)
 
@@ -200,7 +238,7 @@ fun StickySetting(
         Spacer(
             modifier = Modifier.width(8.dp)
         )
-        Text( // make this bolded
+        Text( // make this bolded, do that with material theming later
             text = settingName
         )
         Spacer(
@@ -208,9 +246,9 @@ fun StickySetting(
         )
         Text(
             text = settingValue, 
-            modifier = Modifier.clickable {
-
-            }
+            modifier = Modifier.clickable (
+                onClick = onSettingValueClicked
+            )
         )
     }
 }

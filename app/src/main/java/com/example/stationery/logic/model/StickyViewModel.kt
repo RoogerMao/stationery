@@ -28,6 +28,8 @@ class StickyViewModel(
     private val _stickyUIState = MutableStateFlow(StickyUIState())
     var showStickyEditScreen by mutableStateOf(false)
         private set
+    var showStickyDatePicker by mutableStateOf(false)
+        private set
 
     // non-mutable one we expose to the UI
     val stickyUIState: StateFlow<StickyUIState> = _stickyUIState.asStateFlow()
@@ -60,6 +62,9 @@ class StickyViewModel(
         showStickyEditScreen = false
     }
 
+    fun onToggleStickyDatePicker() {
+        showStickyDatePicker = !showStickyDatePicker
+    }
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
