@@ -1,4 +1,4 @@
-package com.example.stationery.ui.screens
+package com.example.stationery.ui.homescreen
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
@@ -36,6 +36,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.stationery.R
+import com.example.stationery.data.STICKY_TYPE
 import com.example.stationery.data.StickyDetails
 import com.example.stationery.data.StickyUIState
 import com.example.stationery.logic.model.StickyViewModel
@@ -75,7 +76,10 @@ fun HomeScreen(
         EditStickyDialog(
             stickyFlow = stickyViewModel.stickyUIState,
             showDatePicker = stickyViewModel.showStickyDatePicker,
+            showTypeDropdown = stickyViewModel.showTypeDropdown,
             onToggleDatePicker = { stickyViewModel.onToggleStickyDatePicker() },
+            onShowTypeDropdown = { stickyViewModel.onShowTypeDropdown() },
+            onDismissTypeDropdown = { stickyViewModel.onDismissTypeDropdown() },
             onValueChange = { stickyViewModel.updateSticky(it) },
             onDismiss = { stickyViewModel.onDismissEditStickyDialog() },
             onSave = {
@@ -94,7 +98,10 @@ fun HomeScreen(
 fun EditStickyDialog(
     stickyFlow: StateFlow<StickyUIState>,
     showDatePicker: Boolean,
+    showTypeDropdown: Boolean,
     onToggleDatePicker: () -> Unit,
+    onShowTypeDropdown: () -> Unit,
+    onDismissTypeDropdown: () -> Unit,
     onValueChange: (StickyDetails) -> Unit,
     onDismiss: () -> Unit,
     onSave: () -> Unit,
@@ -133,7 +140,7 @@ fun EditStickyDialog(
                 )
 
                 // expand the dialogue to include a calendar, add animations later
-                StickySetting(
+                StickyDateSetting(
                     painterResourceID = R.drawable.baseline_calendar_today_24,
                     settingNameResourceID = R.string.sticky_date,
                     settingValue = stickyUIState.stickyDetails.date,
@@ -168,19 +175,41 @@ fun EditStickyDialog(
                     painterResourceID = R.drawable.baseline_school_24,
                     settingNameResourceID = R.string.sticky_career_field,
                     settingValue = "Sample Field",
-                    onSettingValueClicked = {}
+                    onSettingValueClicked = {},
                 )
-                StickySetting(
+
+                StickyDropdownSetting(
                     painterResourceID = R.drawable.baseline_category_24,
                     settingNameResourceID = R.string.sticky_type,
-                    settingValue = "Research",
-                    onSettingValueClicked = {}
+                    settingValue = stickyUIState.stickyDetails.type,
+                    settingValueIconID = stickyUIState.stickyDetails.typeIconID,
+                    onShowSettingDropdown = onShowTypeDropdown,
+                    onDismissSettingDropdown = onDismissTypeDropdown,
+                    displaySettingDropdown = showTypeDropdown,
+                    dropdownSettingOptions = listOf(
+                        Pair("Research", R.drawable.baseline_lightbulb_24),
+                        Pair("Benchmark", R.drawable.baseline_trending_up_24),
+                        Pair("Experience", R.drawable.baseline_work_24)
+                    ),
+                    onItemClick = {
+                        val newIconID = when(it) {
+                            "Research" -> R.drawable.baseline_lightbulb_24
+                            "Benchmark" -> R.drawable.baseline_trending_up_24
+                            else -> R.drawable.baseline_work_24
+                        }
+
+                        onValueChange(stickyUIState.stickyDetails.copy(
+                            type = it,
+                            typeIconID = newIconID
+                        ))
+                    }
                 )
+
                 StickySetting(
                     painterResourceID = R.drawable.baseline_thumb_up_24,
                     settingNameResourceID = R.string.sticky_interest,
                     settingValue = "Medium",
-                    onSettingValueClicked = { onToggleDatePicker() }
+                    onSettingValueClicked = { }
                 )
                 TextField(
                     value = stickyUIState.stickyDetails.timeCommitted,

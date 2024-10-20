@@ -1,4 +1,4 @@
-package com.example.stationery.ui.screens
+package com.example.stationery.ui
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult

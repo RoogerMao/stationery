@@ -16,6 +16,7 @@ class UserSettingsViewModel : ViewModel() {
     var showEditUsernameDialog by mutableStateOf(false)
         private set
 
+
     val userSettingsUIState: StateFlow<UserSettings> = _userSettingsUIState.asStateFlow()
 
     fun updateProfileImage(newImageId: Uri?) {

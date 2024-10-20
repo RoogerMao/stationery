@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import com.example.stationery.R
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -22,7 +23,8 @@ data class StickyDetails(
     val date: String = LocalDate.now()
         .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)),
     val field: String = Sticky.defaultCareerList[0],
-    val type: String = STICKY_TYPE.RESEARCH.name,
+    val type: String = "Research",
+    val typeIconID: Int = R.drawable.baseline_lightbulb_24,
     val timeCommitted: String = "0.0",
     val interest: String = INTEREST.HIGH.name
 )
@@ -83,22 +85,22 @@ enum class STICKY_TYPE {
 class StickyConverters {
     @TypeConverter
     fun fromStickyType(stickyType: STICKY_TYPE): String {
-        return stickyType.name
+        return stickyType.name[0].uppercaseChar() + stickyType.name.substring(1).lowercase()
     }
 
     @TypeConverter
     fun toStickyType(stickyType: String): STICKY_TYPE {
-        return STICKY_TYPE.valueOf(stickyType)
+        return STICKY_TYPE.valueOf(stickyType.uppercase())
     }
 
     @TypeConverter
     fun fromStickyInterest(stickyInterest: INTEREST): String {
-        return stickyInterest.name
+        return stickyInterest.name[0].uppercaseChar() + stickyInterest.name.substring(1).lowercase()
     }
 
     @TypeConverter
     fun toStickyInterest(stickyInterest: String): INTEREST {
-        return INTEREST.valueOf(stickyInterest)
+        return INTEREST.valueOf(stickyInterest.uppercase())
     }
 }
 

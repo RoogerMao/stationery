@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.example.stationery.logic.model.StickyViewModel
-import com.example.stationery.ui.screens.HomeScreen
+import com.example.stationery.ui.homescreen.HomeScreen
 import com.example.stationery.ui.theme.StationeryTheme
 
 class MainActivity : ComponentActivity() {

@@ -30,6 +30,10 @@ class StickyViewModel(
         private set
     var showStickyDatePicker by mutableStateOf(false)
         private set
+    var showInterestDropdown by mutableStateOf(false)
+        private set
+    var showTypeDropdown by mutableStateOf(false)
+        private set
 
     // non-mutable one we expose to the UI
     val stickyUIState: StateFlow<StickyUIState> = _stickyUIState.asStateFlow()
@@ -65,6 +69,23 @@ class StickyViewModel(
     fun onToggleStickyDatePicker() {
         showStickyDatePicker = !showStickyDatePicker
     }
+
+    fun onShowInterestDropdown() {
+        showInterestDropdown = true
+    }
+
+    fun onDismissInterestDropdown() {
+        showInterestDropdown = false
+    }
+
+    fun onShowTypeDropdown() {
+        showTypeDropdown = true
+    }
+
+    fun onDismissTypeDropdown() {
+        showTypeDropdown = false
+    }
+
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
