@@ -8,12 +8,14 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,9 +28,11 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import com.example.stationery.data.StickyDetails
+import androidx.compose.ui.window.PopupProperties
+import kotlin.math.exp
 
 @Composable
 fun StickyDateSetting(
@@ -173,6 +177,86 @@ fun StickySettingDropdownMenu(
                 onClick = {
                     onItemClick(option.first)
                     onDismissDropdown()
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun StickyFieldSetting(
+    painterResourceID: Int,
+    settingNameResourceID: Int,
+    settingValue: String,
+    careerSearchQuery: String,
+    showFieldDropdown: Boolean,
+    dropdownOptions: List<String>,
+    onDismissFieldDropdown: () -> Unit,
+    onFieldItemClick: (String) -> Unit,
+    onCareerSearchQueryChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val settingName = stringResource(id = settingNameResourceID)
+
+    Row (
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(8.dp)
+    ){
+        Icon(
+            painter = painterResource(painterResourceID),
+            contentDescription = "Edit $settingName"
+        )
+        Spacer(
+            modifier = Modifier.width(8.dp)
+        )
+        Text( // make this bolded, do that with material theming later
+            text = settingName
+        )
+        Spacer(
+            modifier = Modifier.width(8.dp)
+        )
+        StickyCareerSearchBar(
+            settingValue = settingValue,
+            careerSearchQuery = careerSearchQuery,
+            showFieldDropdown = showFieldDropdown,
+            dropdownOptions = dropdownOptions,
+            onDismissFieldDropdown = onDismissFieldDropdown,
+            onFieldItemClick = onFieldItemClick,
+            onCareerSearchQueryChange = onCareerSearchQueryChange
+        )
+    }
+}
+
+@Composable
+fun StickyCareerSearchBar(
+    settingValue: String,
+    careerSearchQuery: String,
+    showFieldDropdown: Boolean,
+    dropdownOptions: List<String>,
+    onDismissFieldDropdown: () -> Unit,
+    onFieldItemClick: (String) -> Unit,
+    onCareerSearchQueryChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    TextField(
+        value = careerSearchQuery,
+        onValueChange = onCareerSearchQueryChange,
+        placeholder = {
+            Text(text = settingValue, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        }
+    )
+
+    DropdownMenu(
+        expanded = showFieldDropdown,
+        onDismissRequest = onDismissFieldDropdown,
+        modifier = Modifier.height((5 * 60).dp) // place holder constant
+    ) {
+        dropdownOptions.forEach { option ->
+            DropdownMenuItem(
+                text = { Text(text = option) },
+                onClick = {
+                    onFieldItemClick(option)
+                    onDismissFieldDropdown()
                 }
             )
         }

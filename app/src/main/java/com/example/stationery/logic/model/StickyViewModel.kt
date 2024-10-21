@@ -1,6 +1,7 @@
 package com.example.stationery.logic.model
 
 import android.util.Log
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,16 +10,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.createSavedStateHandle
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.stationery.StationeryApplication
 import com.example.stationery.data.StickiesRepository
+import com.example.stationery.data.Sticky
 import com.example.stationery.data.StickyDetails
 import com.example.stationery.data.StickyUIState
 import com.example.stationery.data.toSticky
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
 class StickyViewModel(
@@ -26,6 +32,9 @@ class StickyViewModel(
     private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
     private val _stickyUIState = MutableStateFlow(StickyUIState())
+    private val _careerSearchText = MutableStateFlow("")
+    private val _matchingCareers = MutableStateFlow(Sticky.defaultCareerList)
+
     var showStickyEditScreen by mutableStateOf(false)
         private set
     var showStickyDatePicker by mutableStateOf(false)
@@ -34,9 +43,26 @@ class StickyViewModel(
         private set
     var showTypeDropdown by mutableStateOf(false)
         private set
+    var showFieldDropdown by mutableStateOf(false)
+        private set
 
-    // non-mutable one we expose to the UI
+    // non-mutable values we expose to the UI
     val stickyUIState: StateFlow<StickyUIState> = _stickyUIState.asStateFlow()
+    val careerSearchText: StateFlow<String> = _careerSearchText.asStateFlow()
+    val matchingCareers = careerSearchText.combine(_matchingCareers) { careerSearchText, _ ->
+        // always call this block if the query or list of matching career changes
+        if(careerSearchText.isBlank()) Sticky.defaultCareerList
+        else {
+            Sticky.defaultCareerList.filter { defaultCareer ->
+                defaultCareer.contains(careerSearchText, ignoreCase = true)
+            }
+        }
+    }.stateIn(
+        // convert the flow returned to a state flow to store latest value
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        _matchingCareers.value
+    )
 
     // update a sticky's details
     fun updateSticky(stickyDetails: StickyDetails) {
@@ -56,6 +82,14 @@ class StickyViewModel(
 
     private fun validateStickyDetails(stickyDetails: StickyDetails = stickyUIState.value.stickyDetails): Boolean {
         return (stickyDetails.title != "")
+    }
+
+    fun onCareerSearchTextChange(careerSearchQuery: String) {
+        _careerSearchText.value = careerSearchQuery
+
+        // FIX THIS SO LESS CLUNKY
+
+        if (!showFieldDropdown) onShowFieldDropdown()
     }
 
     fun onShowEditStickyDialog() {
@@ -84,6 +118,14 @@ class StickyViewModel(
 
     fun onDismissTypeDropdown() {
         showTypeDropdown = false
+    }
+
+    fun onShowFieldDropdown() {
+        showFieldDropdown = true
+    }
+
+    fun onDismissFieldDropdown() {
+        showFieldDropdown = false
     }
 
     companion object {

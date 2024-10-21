@@ -36,7 +36,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.stationery.R
-import com.example.stationery.data.STICKY_TYPE
+import com.example.stationery.data.Sticky
 import com.example.stationery.data.StickyDetails
 import com.example.stationery.data.StickyUIState
 import com.example.stationery.logic.model.StickyViewModel
@@ -75,15 +75,20 @@ fun HomeScreen(
     if(stickyViewModel.showStickyEditScreen) {
         EditStickyDialog(
             stickyFlow = stickyViewModel.stickyUIState,
+            careerSearchTextFlow = stickyViewModel.careerSearchText,
+            matchingCareersFlow = stickyViewModel.matchingCareers,
             showDatePicker = stickyViewModel.showStickyDatePicker,
             showTypeDropdown = stickyViewModel.showTypeDropdown,
             showInterestDropdown = stickyViewModel.showInterestDropdown,
+            showFieldDropdown = stickyViewModel.showFieldDropdown,
             onToggleDatePicker = { stickyViewModel.onToggleStickyDatePicker() },
             onShowTypeDropdown = { stickyViewModel.onShowTypeDropdown() },
             onDismissTypeDropdown = { stickyViewModel.onDismissTypeDropdown() },
             onShowInterestDropdown = { stickyViewModel.onShowInterestDropdown() },
             onDismissInterestDropdown = { stickyViewModel.onDismissInterestDropdown() },
+            onDismissFieldDropdown = { stickyViewModel.onDismissFieldDropdown() },
             onValueChange = { stickyViewModel.updateSticky(it) },
+            onCareerSearchValueChange = { stickyViewModel.onCareerSearchTextChange(it) },
             onDismiss = { stickyViewModel.onDismissEditStickyDialog() },
             onSave = {
                 coroutineScope.launch {
@@ -100,20 +105,27 @@ fun HomeScreen(
 @Composable
 fun EditStickyDialog(
     stickyFlow: StateFlow<StickyUIState>,
+    careerSearchTextFlow: StateFlow<String>,
+    matchingCareersFlow: StateFlow<List<String>>,
     showDatePicker: Boolean,
     showTypeDropdown: Boolean,
     showInterestDropdown: Boolean,
+    showFieldDropdown: Boolean,
     onToggleDatePicker: () -> Unit,
     onShowTypeDropdown: () -> Unit,
     onDismissTypeDropdown: () -> Unit,
     onShowInterestDropdown: () -> Unit,
     onDismissInterestDropdown: () -> Unit,
+    onDismissFieldDropdown: () -> Unit,
     onValueChange: (StickyDetails) -> Unit,
+    onCareerSearchValueChange: (String) -> Unit,
     onDismiss: () -> Unit,
     onSave: () -> Unit,
     modifier: Modifier = Modifier.focusable()
 ) {
     val stickyUIState by stickyFlow.collectAsState(initial = StickyUIState())
+    val careerSearchText by careerSearchTextFlow.collectAsState(initial = "")
+    val matchingCareers by matchingCareersFlow.collectAsState(initial = Sticky.defaultCareerList)
     val datePickerState = rememberDatePickerState()
     val focusManager= LocalFocusManager.current
 
@@ -179,11 +191,21 @@ fun EditStickyDialog(
                     )
                 }
 
-                StickySetting(
+                // setting to select career
+                StickyFieldSetting(
                     painterResourceID = R.drawable.baseline_school_24,
                     settingNameResourceID = R.string.sticky_career_field,
-                    settingValue = "Sample Field",
-                    onSettingValueClicked = {},
+                    settingValue = stickyUIState.stickyDetails.field,
+                    careerSearchQuery = careerSearchText,
+                    showFieldDropdown = showFieldDropdown,
+                    dropdownOptions = matchingCareers,
+                    onDismissFieldDropdown = onDismissFieldDropdown,
+                    onFieldItemClick = {
+                        onValueChange(stickyUIState.stickyDetails.copy(
+                            field = it
+                        ))
+                    },
+                    onCareerSearchQueryChange = onCareerSearchValueChange
                 )
 
                 // setting to indicate experience type
@@ -276,41 +298,5 @@ fun EditStickyDialog(
                 }
             }
         }
-    }
-}
-
-@Composable
-fun StickySetting(
-    painterResourceID: Int,
-    settingNameResourceID: Int,
-    settingValue: String,
-    onSettingValueClicked: () -> Unit,                       // what to display
-    modifier: Modifier = Modifier
-) {
-    val settingName = stringResource(id = settingNameResourceID)
-
-    Row (
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(8.dp)
-    ){
-        Icon(
-            painter = painterResource(painterResourceID),
-            contentDescription = "Edit $settingName"
-        )
-        Spacer(
-            modifier = Modifier.width(8.dp)
-        )
-        Text( // make this bolded, do that with material theming later
-            text = settingName
-        )
-        Spacer(
-            modifier = Modifier.width(8.dp)
-        )
-        Text(
-            text = settingValue, 
-            modifier = Modifier.clickable (
-                onClick = onSettingValueClicked
-            )
-        )
     }
 }
