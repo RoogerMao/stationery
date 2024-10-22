@@ -16,6 +16,9 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -35,6 +38,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.navigation.NavHostController
 import com.example.stationery.R
 import com.example.stationery.data.Sticky
 import com.example.stationery.data.StickyDetails
@@ -49,10 +53,14 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Date
 
+
+
+
 @Composable
 fun HomeScreen(
     stickyViewModel: StickyViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavHostController
 ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -63,6 +71,17 @@ fun HomeScreen(
             .fillMaxSize()
     ) {
         LazyColumn {  }
+        IconButton(
+            modifier = Modifier.align(Alignment.TopEnd),
+            onClick = {
+                navController.navigate("settings")
+            }
+        ) {
+            Icon(
+                imageVector = Icons.Default.Settings,
+                contentDescription = "Settings"
+            )
+        }
         Icon(
             painter = painterResource(id = R.drawable.baseline_add_24),
             contentDescription = stringResource(id = R.string.add_sticky),

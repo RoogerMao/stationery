@@ -38,6 +38,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.stationery.R
 import com.example.stationery.logic.model.UserSettingsViewModel
@@ -46,7 +48,8 @@ import com.example.stationery.logic.model.UserSettingsViewModel
 @Composable
 fun UserSettingsScreen(
     userSettingsViewModel: UserSettingsViewModel = viewModel(),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavHostController
 ) {
     val userSettingsUIState by userSettingsViewModel.userSettingsUIState.collectAsState()
     Column (
@@ -63,6 +66,16 @@ fun UserSettingsScreen(
             toggleDisplayInsights = { userSettingsViewModel.toggleInsightDisplay() }
         )
     }
+    Button(
+        onClick = {
+            navController.navigate("home")
+        }
+    ) {
+        Text(
+            text = "Done"
+        )
+    }
+
 
     if(userSettingsViewModel.showEditUsernameDialog) {
         Dialog(
@@ -120,6 +133,7 @@ fun UserProfile(
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
+
         LazyColumn {
             item {
                 AsyncImage(
@@ -220,5 +234,5 @@ fun UserSettingsSwitches(
 @Preview(showBackground = true)
 @Composable
 fun UserSettingsPreview() {
-    UserSettingsScreen()
+    UserSettingsScreen(navController = rememberNavController())
 }
