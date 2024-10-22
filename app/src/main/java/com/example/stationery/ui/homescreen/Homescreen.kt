@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
@@ -43,6 +44,7 @@ import com.example.stationery.R
 import com.example.stationery.data.Sticky
 import com.example.stationery.data.StickyDetails
 import com.example.stationery.data.StickyUIState
+import com.example.stationery.data.toStickyDetails
 import com.example.stationery.logic.model.StickyViewModel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -63,6 +65,7 @@ fun HomeScreen(
     navController: NavHostController
 ) {
     val coroutineScope = rememberCoroutineScope()
+    val stickiesUIState by stickyViewModel.stickesUIStateFlow.collectAsState()
 
     Box(
         contentAlignment = Alignment.BottomEnd,
@@ -70,7 +73,11 @@ fun HomeScreen(
             .padding(16.dp)
             .fillMaxSize()
     ) {
-        LazyColumn {  }
+        LazyColumn {
+            items(items = stickiesUIState.stickyList) { stickyUIState ->
+                StickyCard(stickyUIState.toStickyDetails())
+            }
+        }
         IconButton(
             modifier = Modifier.align(Alignment.TopEnd),
             onClick = {

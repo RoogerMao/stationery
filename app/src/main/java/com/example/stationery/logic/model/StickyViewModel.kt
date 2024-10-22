@@ -15,6 +15,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.stationery.StationeryApplication
 import com.example.stationery.data.StickiesRepository
+import com.example.stationery.data.StickiesUIState
 import com.example.stationery.data.Sticky
 import com.example.stationery.data.StickyDetails
 import com.example.stationery.data.StickyUIState
@@ -24,6 +25,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
@@ -31,6 +33,16 @@ class StickyViewModel(
     private val stickyRepository: StickiesRepository,
     private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
+    // for showing stickies in the lazy column
+    val stickesUIStateFlow: StateFlow<StickiesUIState> = stickyRepository.getAllStickiesStream().map {
+            StickiesUIState(it)
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+            initialValue = StickiesUIState()
+        )
+
+    // for creating stickies
     private val _stickyUIState = MutableStateFlow(StickyUIState())
     private val _careerSearchText = MutableStateFlow("")
     private val _matchingCareers = MutableStateFlow(Sticky.defaultCareerList)
@@ -129,6 +141,8 @@ class StickyViewModel(
     }
 
     companion object {
+        private const val TIMEOUT_MILLIS = 5_000L
+
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val savedStateHandle = createSavedStateHandle()

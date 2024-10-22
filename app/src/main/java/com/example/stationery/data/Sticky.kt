@@ -9,6 +9,9 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
+// ui state for lazy column
+data class StickiesUIState(val stickyList: List<Sticky> = listOf())
+
 // the information we want to know for displaying the UI
 data class StickyUIState(
     val stickyDetails: StickyDetails = StickyDetails(),
