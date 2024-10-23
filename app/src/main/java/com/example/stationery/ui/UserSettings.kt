@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
@@ -66,16 +67,16 @@ fun UserSettingsScreen(
             toggleDisplayInsights = { userSettingsViewModel.toggleInsightDisplay() }
         )
     }
-    Button(
-        onClick = {
-            navController.navigate("home")
-        }
-    ) {
-        Text(
-            text = "Done"
+    Icon(
+        painter = painterResource(id = R.drawable.baseline_arrow_back_24),
+        contentDescription = "Return to Homescreen",
+        modifier = Modifier.padding(8.dp)
+            .clickable(
+            onClick = {
+                navController.navigate("home")
+            }
         )
-    }
-
+    )
 
     if(userSettingsViewModel.showEditUsernameDialog) {
         Dialog(

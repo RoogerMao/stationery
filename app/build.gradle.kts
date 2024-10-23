@@ -77,4 +77,7 @@ dependencies {
 
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation(libs.androidx.room.ktx)
+
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.7.3")
+    implementation("com.google.android.gms:play-services-fonts:<version>")
 }

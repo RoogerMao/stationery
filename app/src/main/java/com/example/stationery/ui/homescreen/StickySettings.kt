@@ -23,9 +23,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -141,21 +144,24 @@ fun StickySettingDropdownMenu(
 
     Text(
         text = text,
-        modifier = Modifier.onSizeChanged {
-            itemHeight = with(density) { it.height.toDp() }
-        }.pointerInput(true) {
-            detectTapGestures(
-                onPress = {
-                    onShowDropdown()
-                    pressOffset = DpOffset(it.x.toDp(), it.y.toDp())
+        modifier = Modifier
+            .onSizeChanged {
+                itemHeight = with(density) { it.height.toDp() }
+            }
+            .pointerInput(true) {
+                detectTapGestures(
+                    onPress = {
+                        onShowDropdown()
+                        pressOffset = DpOffset(it.x.toDp(), it.y.toDp())
 
-                    val press = PressInteraction.Press(it)
-                    interactionSource.emit(press)
-                    tryAwaitRelease()
-                    interactionSource.emit(PressInteraction.Release(press))
-                }
-            )
-        }.indication(interactionSource, LocalIndication.current)
+                        val press = PressInteraction.Press(it)
+                        interactionSource.emit(press)
+                        tryAwaitRelease()
+                        interactionSource.emit(PressInteraction.Release(press))
+                    }
+                )
+            }
+            .indication(interactionSource, LocalIndication.current)
     )
 
     DropdownMenu(
@@ -189,9 +195,7 @@ fun StickyFieldSetting(
     settingNameResourceID: Int,
     settingValue: String,
     careerSearchQuery: String,
-    showFieldDropdown: Boolean,
     dropdownOptions: List<String>,
-    onDismissFieldDropdown: () -> Unit,
     onFieldItemClick: (String) -> Unit,
     onCareerSearchQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -218,9 +222,7 @@ fun StickyFieldSetting(
         StickyCareerSearchBar(
             settingValue = settingValue,
             careerSearchQuery = careerSearchQuery,
-            showFieldDropdown = showFieldDropdown,
             dropdownOptions = dropdownOptions,
-            onDismissFieldDropdown = onDismissFieldDropdown,
             onFieldItemClick = onFieldItemClick,
             onCareerSearchQueryChange = onCareerSearchQueryChange
         )
@@ -231,24 +233,30 @@ fun StickyFieldSetting(
 fun StickyCareerSearchBar(
     settingValue: String,
     careerSearchQuery: String,
-    showFieldDropdown: Boolean,
     dropdownOptions: List<String>,
-    onDismissFieldDropdown: () -> Unit,
     onFieldItemClick: (String) -> Unit,
     onCareerSearchQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var expandedMenu by remember { mutableStateOf(false) }
+
     TextField(
         value = careerSearchQuery,
-        onValueChange = onCareerSearchQueryChange,
+        onValueChange = {
+            onCareerSearchQueryChange(it)
+            expandedMenu = true
+        },
         placeholder = {
             Text(text = settingValue, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        },
+        modifier = Modifier.onFocusChanged { focusState ->
+            expandedMenu = focusState.isFocused
         }
     )
 
     DropdownMenu(
-        expanded = showFieldDropdown,
-        onDismissRequest = onDismissFieldDropdown,
+        expanded = expandedMenu,
+        onDismissRequest = { expandedMenu = false },
         modifier = Modifier.height((5 * 60).dp) // place holder constant
     ) {
         dropdownOptions.forEach { option ->
@@ -256,7 +264,7 @@ fun StickyCareerSearchBar(
                 text = { Text(text = option) },
                 onClick = {
                     onFieldItemClick(option)
-                    onDismissFieldDropdown()
+                    expandedMenu = false
                 }
             )
         }

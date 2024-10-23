@@ -11,10 +11,10 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface StickyDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(sticky: Sticky)
+    suspend fun insert(sticky: Sticky)
 
     @Update
-    fun update(sticky: Sticky)
+    suspend fun update(sticky: Sticky)
 
     @Delete
     fun delete(sticky: Sticky)

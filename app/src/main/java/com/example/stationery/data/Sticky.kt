@@ -2,6 +2,7 @@ package com.example.stationery.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.example.stationery.R
@@ -86,6 +87,7 @@ enum class STICKY_TYPE {
     RESEARCH, BENCHMARK, EXPERIENCE
 }
 
+@ProvidedTypeConverter
 class StickyConverters {
     @TypeConverter
     fun fromStickyType(stickyType: STICKY_TYPE): String {
@@ -118,9 +120,9 @@ fun Sticky.toStickyDetails(): StickyDetails = StickyDetails(
     title = title,
     date = date,
     field = field,
-    type = type.name,
+    type = StickyConverters().fromStickyType(type),
     timeCommitted = timeCommitted.toString(),
-    interest = interest.name
+    interest = StickyConverters().fromStickyInterest(interest)
 )
 
 fun Sticky.toStickyUIState(areStickyDetailsValid: Boolean): StickyUIState = StickyUIState(
@@ -133,8 +135,8 @@ fun StickyDetails.toSticky(): Sticky = Sticky(
     title = title,
     date = date,
     field = field,
-    type = STICKY_TYPE.valueOf(type),
+    type = StickyConverters().toStickyType(type),
     timeCommitted = timeCommitted.toFloatOrNull() ?: 0.0F,
-    interest = INTEREST.valueOf(interest)
+    interest = StickyConverters().toStickyInterest(interest)
 )
 

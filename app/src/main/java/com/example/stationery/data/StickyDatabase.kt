@@ -17,8 +17,11 @@ abstract class StickyDatabase: RoomDatabase() {
         private var Instance: StickyDatabase? = null
 
         fun getDatabase(context: Context): StickyDatabase {
+            val stickyConverters = StickyConverters()
+
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(context, StickyDatabase::class.java, "sticky_database")
+                    .addTypeConverter(stickyConverters)
                     .build().also {
                         Instance = it
                     }

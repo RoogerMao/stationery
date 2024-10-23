@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -54,8 +55,6 @@ class StickyViewModel(
     var showInterestDropdown by mutableStateOf(false)
         private set
     var showTypeDropdown by mutableStateOf(false)
-        private set
-    var showFieldDropdown by mutableStateOf(false)
         private set
 
     // non-mutable values we expose to the UI
@@ -98,10 +97,6 @@ class StickyViewModel(
 
     fun onCareerSearchTextChange(careerSearchQuery: String) {
         _careerSearchText.value = careerSearchQuery
-
-        // FIX THIS SO LESS CLUNKY
-
-        if (!showFieldDropdown) onShowFieldDropdown()
     }
 
     fun onShowEditStickyDialog() {
@@ -130,14 +125,6 @@ class StickyViewModel(
 
     fun onDismissTypeDropdown() {
         showTypeDropdown = false
-    }
-
-    fun onShowFieldDropdown() {
-        showFieldDropdown = true
-    }
-
-    fun onDismissFieldDropdown() {
-        showFieldDropdown = false
     }
 
     companion object {

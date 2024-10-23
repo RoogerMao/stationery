@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -73,7 +74,9 @@ fun HomeScreen(
             .padding(16.dp)
             .fillMaxSize()
     ) {
-        LazyColumn {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
+        ) {
             items(items = stickiesUIState.stickyList) { stickyUIState ->
                 StickyCard(stickyUIState.toStickyDetails())
             }
@@ -106,13 +109,11 @@ fun HomeScreen(
             showDatePicker = stickyViewModel.showStickyDatePicker,
             showTypeDropdown = stickyViewModel.showTypeDropdown,
             showInterestDropdown = stickyViewModel.showInterestDropdown,
-            showFieldDropdown = stickyViewModel.showFieldDropdown,
             onToggleDatePicker = { stickyViewModel.onToggleStickyDatePicker() },
             onShowTypeDropdown = { stickyViewModel.onShowTypeDropdown() },
             onDismissTypeDropdown = { stickyViewModel.onDismissTypeDropdown() },
             onShowInterestDropdown = { stickyViewModel.onShowInterestDropdown() },
             onDismissInterestDropdown = { stickyViewModel.onDismissInterestDropdown() },
-            onDismissFieldDropdown = { stickyViewModel.onDismissFieldDropdown() },
             onValueChange = { stickyViewModel.updateSticky(it) },
             onCareerSearchValueChange = { stickyViewModel.onCareerSearchTextChange(it) },
             onDismiss = { stickyViewModel.onDismissEditStickyDialog() },
@@ -136,13 +137,11 @@ fun EditStickyDialog(
     showDatePicker: Boolean,
     showTypeDropdown: Boolean,
     showInterestDropdown: Boolean,
-    showFieldDropdown: Boolean,
     onToggleDatePicker: () -> Unit,
     onShowTypeDropdown: () -> Unit,
     onDismissTypeDropdown: () -> Unit,
     onShowInterestDropdown: () -> Unit,
     onDismissInterestDropdown: () -> Unit,
-    onDismissFieldDropdown: () -> Unit,
     onValueChange: (StickyDetails) -> Unit,
     onCareerSearchValueChange: (String) -> Unit,
     onDismiss: () -> Unit,
@@ -223,9 +222,7 @@ fun EditStickyDialog(
                     settingNameResourceID = R.string.sticky_career_field,
                     settingValue = stickyUIState.stickyDetails.field,
                     careerSearchQuery = careerSearchText,
-                    showFieldDropdown = showFieldDropdown,
                     dropdownOptions = matchingCareers,
-                    onDismissFieldDropdown = onDismissFieldDropdown,
                     onFieldItemClick = {
                         onValueChange(stickyUIState.stickyDetails.copy(
                             field = it
