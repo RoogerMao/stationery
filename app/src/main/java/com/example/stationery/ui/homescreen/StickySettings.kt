@@ -211,7 +211,7 @@ fun StickyFieldSetting(
     val stickyUIState by settingValueFlow.collectAsState()
     val settingValue = stickyUIState.stickyDetails.field
 
-    Column () {
+    Column {
         Row (
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(8.dp)

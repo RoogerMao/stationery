@@ -151,6 +151,7 @@ fun HomeScreen(
             onDismissInterestDropdown = { stickyViewModel.onDismissInterestDropdown() },
             onValueChange = { stickyViewModel.updateSticky(it) },
             onCareerSearchValueChange = { stickyViewModel.onCareerSearchTextChange(it) },
+            onCareerSearchValueDone = { stickyViewModel.updateMatchingCareers() },
             onDismiss = { stickyViewModel.onDismissEditStickyDialog() },
             onSave = {
                 coroutineScope.launch {
@@ -179,6 +180,7 @@ fun EditStickyDialog(
     onDismissInterestDropdown: () -> Unit,
     onValueChange: (StickyDetails) -> Unit,
     onCareerSearchValueChange: (String) -> Unit,
+    onCareerSearchValueDone: () -> Unit,
     onDismiss: () -> Unit,
     onSave: () -> Unit,
     modifier: Modifier = Modifier.focusable()
@@ -255,7 +257,7 @@ fun EditStickyDialog(
                 StickyFieldSetting(
                     painterResourceID = R.drawable.baseline_school_24,
                     settingNameResourceID = R.string.sticky_career_field,
-                    settingValue = stickyUIState.stickyDetails.field,
+                    settingValueFlow = stickyFlow,
                     careerSearchQuery = careerSearchText,
                     dropdownOptions = matchingCareers,
                     onFieldItemClick = {
@@ -263,7 +265,8 @@ fun EditStickyDialog(
                             field = it
                         ))
                     },
-                    onCareerSearchQueryChange = onCareerSearchValueChange
+                    onCareerSearchQueryChange = onCareerSearchValueChange,
+                    onCareerSearchQueryDone = onCareerSearchValueDone
                 )
 
                 // setting to indicate experience type
