@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import com.example.stationery.logic.model.SearchViewModel
 import com.example.stationery.logic.model.StickyViewModel
 import com.example.stationery.ui.UserSettingsScreen
 import com.example.stationery.ui.homescreen.HomeScreen
@@ -19,6 +20,7 @@ import com.example.stationery.ui.theme.StationeryTheme
 
 class MainActivity : ComponentActivity() {
     private val stickyViewModel: StickyViewModel by viewModels<StickyViewModel> { StickyViewModel.Factory }
+    private val searchViewModel: SearchViewModel by viewModels<SearchViewModel> { SearchViewModel.Factory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +37,7 @@ class MainActivity : ComponentActivity() {
                         composable("home") {
                             HomeScreen(
                                 stickyViewModel = stickyViewModel,
+                                searchViewModel = searchViewModel,
                                 navController = navController
                             )
                         }

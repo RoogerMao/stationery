@@ -52,6 +52,7 @@ import com.example.stationery.data.Sticky
 import com.example.stationery.data.StickyDetails
 import com.example.stationery.data.StickyUIState
 import com.example.stationery.data.toStickyDetails
+import com.example.stationery.logic.model.SearchViewModel
 import com.example.stationery.logic.model.StickyViewModel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -66,12 +67,13 @@ import java.util.Date
 @Composable
 fun HomeScreen(
     stickyViewModel: StickyViewModel,
+    searchViewModel: SearchViewModel,
     modifier: Modifier = Modifier,
     navController: NavHostController
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val stickiesUIState by stickyViewModel.stickiesUIStateFlow.collectAsState()
-    val stickySearchQuery by stickyViewModel.stickySearchQuery.collectAsState()
+    val stickiesUIState by searchViewModel.stickiesUIStateFlow.collectAsState()
+    val stickySearchQuery by searchViewModel.stickySearchQuery.collectAsState()
 
     Column(
         modifier = Modifier.padding(8.dp)
@@ -79,7 +81,7 @@ fun HomeScreen(
         Row {
             TextField(
                 value = stickySearchQuery,
-                onValueChange = { stickyViewModel.updateSearchQuery(it) },
+                onValueChange = { searchViewModel.updateStickySearchQuery(it) },
                 modifier = Modifier
                     .weight(1F),
                 placeholder = { Text("Search sticky notes...") },
