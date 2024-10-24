@@ -113,6 +113,10 @@ fun HomeScreen(
             }
         }
 
+        Spacer(modifier = Modifier.height(8.dp))
+
+        AdvancedSearchChipRow(searchViewModel)
+
         Spacer(modifier = Modifier.height(16.dp))
 
         Box(
