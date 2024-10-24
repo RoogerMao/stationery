@@ -34,11 +34,29 @@ class StickyViewModel(
     private val stickyRepository: StickiesRepository,
     private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
-    private val _searchQuery = MutableStateFlow("")
-    val searchQuery = _searchQuery.asStateFlow()
+    // for creating stickies
+    private val _stickySearchQuery = MutableStateFlow("")
+    private val _stickyUIState = MutableStateFlow(StickyUIState())
+    private val _careerSearchText = MutableStateFlow("")
+    private val _matchingCareers = MutableStateFlow(Sticky.defaultCareerList)
+
+    var showStickyEditScreen by mutableStateOf(false)
+        private set
+    var showStickyDatePicker by mutableStateOf(false)
+        private set
+    var showInterestDropdown by mutableStateOf(false)
+        private set
+    var showTypeDropdown by mutableStateOf(false)
+        private set
+
+    // non-mutable values we expose to the UI
+    val stickySearchQuery = _stickySearchQuery.asStateFlow()
+    val stickyUIState: StateFlow<StickyUIState> = _stickyUIState.asStateFlow()
+    val careerSearchText: StateFlow<String> = _careerSearchText.asStateFlow()
+    val matchingCareers: StateFlow<List<String>> = _matchingCareers.asStateFlow()
 
     // for showing stickies in the lazy column
-    val stickesUIStateFlow: StateFlow<StickiesUIState> = _searchQuery
+    val stickiesUIStateFlow: StateFlow<StickiesUIState> = _stickySearchQuery
         .debounce(300L) // delay to stop overflow
         .combine(stickyRepository.getAllStickiesStream()) { query, allStickies ->
             if (query.isEmpty()) {
@@ -56,27 +74,8 @@ class StickyViewModel(
         )
 
     fun updateSearchQuery(query: String) { // update the search query
-        _searchQuery.value = query
+        _stickySearchQuery.value = query
     }
-
-    // for creating stickies
-    private val _stickyUIState = MutableStateFlow(StickyUIState())
-    private val _careerSearchText = MutableStateFlow("")
-    private val _matchingCareers = MutableStateFlow(Sticky.defaultCareerList)
-
-    var showStickyEditScreen by mutableStateOf(false)
-        private set
-    var showStickyDatePicker by mutableStateOf(false)
-        private set
-    var showInterestDropdown by mutableStateOf(false)
-        private set
-    var showTypeDropdown by mutableStateOf(false)
-        private set
-
-    // non-mutable values we expose to the UI
-    val stickyUIState: StateFlow<StickyUIState> = _stickyUIState.asStateFlow()
-    val careerSearchText: StateFlow<String> = _careerSearchText.asStateFlow()
-    val matchingCareers: StateFlow<List<String>> = _matchingCareers.asStateFlow()
 
     fun updateMatchingCareers() {
         if(careerSearchText.value != "") {
@@ -94,11 +93,6 @@ class StickyViewModel(
                 areStickyDetailsValid = validateStickyDetails(stickyDetails)
             )
         }
-
-        Log.d(
-            "debugging",
-            _stickyUIState.value.stickyDetails.field
-        )
     }
 
     suspend fun saveSticky() {

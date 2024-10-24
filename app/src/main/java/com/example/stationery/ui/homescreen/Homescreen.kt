@@ -2,12 +2,15 @@ package com.example.stationery.ui.homescreen
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,10 +23,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -55,14 +61,6 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Date
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-
-
-
-
 
 
 @Composable
@@ -72,51 +70,36 @@ fun HomeScreen(
     navController: NavHostController
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val stickiesUIState by stickyViewModel.stickesUIStateFlow.collectAsState()
-    val searchQuery by stickyViewModel.searchQuery.collectAsState()
+    val stickiesUIState by stickyViewModel.stickiesUIStateFlow.collectAsState()
+    val stickySearchQuery by stickyViewModel.stickySearchQuery.collectAsState()
 
     Column(
-        modifier = Modifier.padding(16.dp).fillMaxSize()
+        modifier = Modifier.padding(8.dp)
     ) {
-        TextField(
-            value = searchQuery,
-            onValueChange = { stickyViewModel.updateSearchQuery(it) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            placeholder = { Text("Search sticky notes...") },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Search"
-                )
-            },
-            singleLine = true,
-            shape = MaterialTheme.shapes.medium,
-            colors = TextFieldDefaults.colors(
-                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
-            )
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-
-        Box(
-            contentAlignment = Alignment.BottomEnd,
-            modifier = modifier
-                .padding(16.dp)
-                .fillMaxSize()
-        ) {
-            LazyColumn(
+        Row {
+            TextField(
+                value = stickySearchQuery,
+                onValueChange = { stickyViewModel.updateSearchQuery(it) },
                 modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxSize()
-            ) {
-                items(items = stickiesUIState.stickyList) { stickyUIState ->
-                    StickyCard(stickyUIState.toStickyDetails())
-                }
-            }
+                    .weight(1F),
+                placeholder = { Text("Search sticky notes...") },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search"
+                    )
+                },
+                singleLine = true,
+                shape = MaterialTheme.shapes.medium,
+                colors = TextFieldDefaults.colors(
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
             IconButton(
-                modifier = Modifier.align(Alignment.BottomStart),
                 onClick = {
                     navController.navigate("settings")
                 }
@@ -125,6 +108,23 @@ fun HomeScreen(
                     imageVector = Icons.Default.Settings,
                     contentDescription = "Settings"
                 )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Box(
+            contentAlignment = Alignment.BottomEnd,
+            modifier = modifier
+                .fillMaxSize()
+        ) {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(items = stickiesUIState.stickyList) { stickyUIState ->
+                    StickyCard(stickyUIState.toStickyDetails())
+                }
             }
             Icon(
                 painter = painterResource(id = R.drawable.baseline_add_24),
