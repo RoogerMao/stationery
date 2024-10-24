@@ -61,7 +61,11 @@ class SearchViewModel(
 
     fun toggleSelectedChip(index: Int) {
         // restrict user to one filter
-        chipsSelected[index] = !chipsSelected[index]
+        chipsSelected = chipsSelected.mapIndexed { i, chipSelected ->
+            if (i == index) !chipSelected else chipSelected
+        }.toMutableList()
+
+        Log.d("debugging", "${chipsSelected[index]}")
 
         if(chipsSelected[index]){
             // if this filter is selected, disable all other filters
