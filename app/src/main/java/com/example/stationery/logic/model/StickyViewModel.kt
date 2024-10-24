@@ -76,20 +76,15 @@ class StickyViewModel(
     // non-mutable values we expose to the UI
     val stickyUIState: StateFlow<StickyUIState> = _stickyUIState.asStateFlow()
     val careerSearchText: StateFlow<String> = _careerSearchText.asStateFlow()
-    val matchingCareers = careerSearchText.combine(_matchingCareers) { careerSearchText, _ ->
-        // always call this block if the query or list of matching career changes
-        if(careerSearchText.isBlank()) Sticky.defaultCareerList
-        else {
-            Sticky.defaultCareerList.filter { defaultCareer ->
-                defaultCareer.contains(careerSearchText, ignoreCase = true)
+    val matchingCareers: StateFlow<List<String>> = _matchingCareers.asStateFlow()
+
+    fun updateMatchingCareers() {
+        if(careerSearchText.value != "") {
+            _matchingCareers.value = Sticky.defaultCareerList.filter {
+                it.contains(careerSearchText.value, ignoreCase = true)
             }
         }
-    }.stateIn(
-        // convert the flow returned to a state flow to store latest value
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        _matchingCareers.value
-    )
+    }
 
     // update a sticky's details
     fun updateSticky(stickyDetails: StickyDetails) {
@@ -99,6 +94,11 @@ class StickyViewModel(
                 areStickyDetailsValid = validateStickyDetails(stickyDetails)
             )
         }
+
+        Log.d(
+            "debugging",
+            _stickyUIState.value.stickyDetails.field
+        )
     }
 
     suspend fun saveSticky() {

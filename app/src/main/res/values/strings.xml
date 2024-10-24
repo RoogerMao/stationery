@@ -7,7 +7,7 @@
     <string name="edit_username">Edit Username</string>
     <string name="add_sticky">Create a New Sticky</string>
     <string name="sticky_date">Date</string>
-    <string name="sticky_career_field">Career Fieldy</string>
-    <string name="sticky_type">Experience Type</string>
+    <string name="sticky_career_field">Career Field</string>
+    <string name="sticky_type">Activity Type</string>
     <string name="sticky_interest">Interest</string>
 </resources>

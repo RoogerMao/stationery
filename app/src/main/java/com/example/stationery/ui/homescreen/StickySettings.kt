@@ -2,14 +2,17 @@ package com.example.stationery.ui.homescreen
 
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -17,14 +20,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
@@ -34,8 +37,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.PopupProperties
-import kotlin.math.exp
+import com.example.stationery.R
+import com.example.stationery.data.StickyUIState
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun StickyDateSetting(
@@ -193,71 +198,98 @@ fun StickySettingDropdownMenu(
 fun StickyFieldSetting(
     painterResourceID: Int,
     settingNameResourceID: Int,
-    settingValue: String,
+    settingValueFlow: StateFlow<StickyUIState>,
     careerSearchQuery: String,
     dropdownOptions: List<String>,
     onFieldItemClick: (String) -> Unit,
     onCareerSearchQueryChange: (String) -> Unit,
+    onCareerSearchQueryDone: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val focusManager = LocalFocusManager.current
     val settingName = stringResource(id = settingNameResourceID)
+    val stickyUIState by settingValueFlow.collectAsState()
+    val settingValue = stickyUIState.stickyDetails.field
 
-    Row (
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(8.dp)
-    ){
-        Icon(
-            painter = painterResource(painterResourceID),
-            contentDescription = "Edit $settingName"
-        )
-        Spacer(
-            modifier = Modifier.width(8.dp)
-        )
-        Text( // make this bolded, do that with material theming later
-            text = settingName
-        )
-        Spacer(
-            modifier = Modifier.width(8.dp)
-        )
+    Column () {
+        Row (
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(8.dp)
+        ){
+            Icon(
+                painter = painterResource(painterResourceID),
+                contentDescription = "Edit $settingName"
+            )
+            Spacer(
+                modifier = Modifier.width(8.dp)
+            )
+            Text( // make this bolded, do that with material theming later
+                text = settingName
+            )
+            Spacer(
+                modifier = Modifier.width(8.dp)
+            )
+            Text(
+                text = settingValue,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
         StickyCareerSearchBar(
-            settingValue = settingValue,
+            settingValueFlow = settingValueFlow,
             careerSearchQuery = careerSearchQuery,
             dropdownOptions = dropdownOptions,
             onFieldItemClick = onFieldItemClick,
-            onCareerSearchQueryChange = onCareerSearchQueryChange
+            onCareerSearchQueryChange = onCareerSearchQueryChange,
+            onCareerSearchQueryDone = onCareerSearchQueryDone,
+            modifier = Modifier.focusable()
+        )
+        Spacer(
+            modifier = Modifier.height(8.dp)
         )
     }
+
 }
 
 @Composable
 fun StickyCareerSearchBar(
-    settingValue: String,
+    settingValueFlow: StateFlow<StickyUIState>,
     careerSearchQuery: String,
     dropdownOptions: List<String>,
     onFieldItemClick: (String) -> Unit,
     onCareerSearchQueryChange: (String) -> Unit,
+    onCareerSearchQueryDone: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var expandedMenu by remember { mutableStateOf(false) }
+    val stickyUIState by settingValueFlow.collectAsState()
 
     TextField(
         value = careerSearchQuery,
         onValueChange = {
             onCareerSearchQueryChange(it)
-            expandedMenu = true
+        },
+        trailingIcon = {
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_search_24),
+                contentDescription = "Search",
+                modifier = Modifier.clickable {
+                    onCareerSearchQueryDone()
+                    expandedMenu = true
+                }
+            )
         },
         placeholder = {
-            Text(text = settingValue, maxLines = 2, overflow = TextOverflow.Ellipsis)
-        },
-        modifier = Modifier.onFocusChanged { focusState ->
-            expandedMenu = focusState.isFocused
+            Text(text = "Search Career List Here")
         }
     )
 
     DropdownMenu(
         expanded = expandedMenu,
         onDismissRequest = { expandedMenu = false },
-        modifier = Modifier.height((5 * 60).dp) // place holder constant
+        modifier = Modifier.sizeIn(
+            maxHeight = 250.dp
+        )
     ) {
         dropdownOptions.forEach { option ->
             DropdownMenuItem(
