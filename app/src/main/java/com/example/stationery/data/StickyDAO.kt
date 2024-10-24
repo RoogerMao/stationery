@@ -26,5 +26,43 @@ interface StickyDAO {
     @Query("SELECT * FROM stickies WHERE title LIKE '%' || :searchQuery || '%' ORDER BY date ASC") //search query is a string
     fun searchStickies(searchQuery: String): Flow<List<Sticky>>
 
-    //TO ADD MORE
+    // filter by date
+    @Query("SELECT * FROM stickies ORDER BY date DESC")
+    fun getStickiesByDateDesc(): Flow<List<Sticky>>
+
+    // filter by career field
+    @Query("SELECT * FROM stickies WHERE field = :careerField ORDER BY date DESC")
+    fun getStickiesByCareerField(careerField: String): Flow<List<Sticky>>
+
+    // filter by activity type
+    @Query("SELECT * FROM stickies WHERE type = :activityType ORDER BY date DESC")
+    fun getStickiesByType(activityType: STICKY_TYPE): Flow<List<Sticky>>
+
+    // filter by time committed
+    @Query("SELECT * FROM stickies ORDER BY timeCommitted DESC")
+    fun getStickiesByTimeDesc(): Flow<List<Sticky>>
+
+    // filter by interest level
+    @Query("SELECT * FROM stickies WHERE interest = :interestLevel ORDER BY date DESC")
+    fun getStickiesByInterest(interestLevel: INTEREST): Flow<List<Sticky>>
+
+    // multiple filters
+    @Query("""
+    SELECT * FROM stickies 
+    WHERE (:careerField IS NULL OR field = :careerField)
+    AND (:type IS NULL OR type = :type)
+    AND (:interest IS NULL OR interest = :interest)
+    ORDER BY 
+    CASE 
+        WHEN :sortBy = 'date' THEN date
+        WHEN :sortBy = 'time' THEN timeCommitted
+    END DESC
+""")
+    fun getStickiesWithFilters(
+        careerField: String? = null,
+        type: STICKY_TYPE? = null,
+        interest: INTEREST? = null,
+        sortBy: String = "date"
+    ): Flow<List<Sticky>>
+
 }
