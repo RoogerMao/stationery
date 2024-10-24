@@ -5,11 +5,8 @@ import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
@@ -57,8 +54,6 @@ import java.time.format.FormatStyle
 import java.util.Date
 
 
-
-
 @Composable
 fun HomeScreen(
     stickyViewModel: StickyViewModel,
@@ -68,37 +63,39 @@ fun HomeScreen(
     val coroutineScope = rememberCoroutineScope()
     val stickiesUIState by stickyViewModel.stickesUIStateFlow.collectAsState()
 
-    Box(
-        contentAlignment = Alignment.BottomEnd,
-        modifier = modifier
-            .padding(16.dp)
-            .fillMaxSize()
-    ) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
+    Column {
+        Box(
+            contentAlignment = Alignment.BottomEnd,
+            modifier = modifier
+                .padding(16.dp)
+                .fillMaxSize()
         ) {
-            items(items = stickiesUIState.stickyList) { stickyUIState ->
-                StickyCard(stickyUIState.toStickyDetails())
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(items = stickiesUIState.stickyList) { stickyUIState ->
+                    StickyCard(stickyUIState.toStickyDetails())
+                }
             }
-        }
-        IconButton(
-            modifier = Modifier.align(Alignment.TopEnd),
-            onClick = {
-                navController.navigate("settings")
+            IconButton(
+                modifier = Modifier.align(Alignment.TopEnd),
+                onClick = {
+                    navController.navigate("settings")
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "Settings"
+                )
             }
-        ) {
             Icon(
-                imageVector = Icons.Default.Settings,
-                contentDescription = "Settings"
+                painter = painterResource(id = R.drawable.baseline_add_24),
+                contentDescription = stringResource(id = R.string.add_sticky),
+                modifier = Modifier.clickable {
+                    stickyViewModel.onShowEditStickyDialog()
+                }
             )
         }
-        Icon(
-            painter = painterResource(id = R.drawable.baseline_add_24),
-            contentDescription = stringResource(id = R.string.add_sticky),
-            modifier = Modifier.clickable {
-                stickyViewModel.onShowEditStickyDialog()
-            }
-        )
     }
 
     if(stickyViewModel.showStickyEditScreen) {
@@ -116,6 +113,7 @@ fun HomeScreen(
             onDismissInterestDropdown = { stickyViewModel.onDismissInterestDropdown() },
             onValueChange = { stickyViewModel.updateSticky(it) },
             onCareerSearchValueChange = { stickyViewModel.onCareerSearchTextChange(it) },
+            onCareerSearchValueDone = { stickyViewModel.updateMatchingCareers() },
             onDismiss = { stickyViewModel.onDismissEditStickyDialog() },
             onSave = {
                 coroutineScope.launch {
@@ -144,6 +142,7 @@ fun EditStickyDialog(
     onDismissInterestDropdown: () -> Unit,
     onValueChange: (StickyDetails) -> Unit,
     onCareerSearchValueChange: (String) -> Unit,
+    onCareerSearchValueDone: () -> Unit,
     onDismiss: () -> Unit,
     onSave: () -> Unit,
     modifier: Modifier = Modifier.focusable()
@@ -220,7 +219,7 @@ fun EditStickyDialog(
                 StickyFieldSetting(
                     painterResourceID = R.drawable.baseline_school_24,
                     settingNameResourceID = R.string.sticky_career_field,
-                    settingValue = stickyUIState.stickyDetails.field,
+                    settingValueFlow = stickyFlow,
                     careerSearchQuery = careerSearchText,
                     dropdownOptions = matchingCareers,
                     onFieldItemClick = {
@@ -228,7 +227,8 @@ fun EditStickyDialog(
                             field = it
                         ))
                     },
-                    onCareerSearchQueryChange = onCareerSearchValueChange
+                    onCareerSearchQueryChange = onCareerSearchValueChange,
+                    onCareerSearchQueryDone = onCareerSearchValueDone
                 )
 
                 // setting to indicate experience type
