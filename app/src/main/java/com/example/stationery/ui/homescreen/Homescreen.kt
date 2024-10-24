@@ -55,6 +55,12 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Date
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+
+
 
 
 
@@ -67,38 +73,67 @@ fun HomeScreen(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val stickiesUIState by stickyViewModel.stickesUIStateFlow.collectAsState()
+    val searchQuery by stickyViewModel.searchQuery.collectAsState()
 
-    Box(
-        contentAlignment = Alignment.BottomEnd,
-        modifier = modifier
-            .padding(16.dp)
-            .fillMaxSize()
+    Column(
+        modifier = Modifier.padding(16.dp).fillMaxSize()
     ) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
+        TextField(
+            value = searchQuery,
+            onValueChange = { stickyViewModel.updateSearchQuery(it) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            placeholder = { Text("Search sticky notes...") },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Search"
+                )
+            },
+            singleLine = true,
+            shape = MaterialTheme.shapes.medium,
+            colors = TextFieldDefaults.colors(
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+
+        Box(
+            contentAlignment = Alignment.BottomEnd,
+            modifier = modifier
+                .padding(16.dp)
+                .fillMaxSize()
         ) {
-            items(items = stickiesUIState.stickyList) { stickyUIState ->
-                StickyCard(stickyUIState.toStickyDetails())
+            LazyColumn(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxSize()
+            ) {
+                items(items = stickiesUIState.stickyList) { stickyUIState ->
+                    StickyCard(stickyUIState.toStickyDetails())
+                }
             }
-        }
-        IconButton(
-            modifier = Modifier.align(Alignment.TopEnd),
-            onClick = {
-                navController.navigate("settings")
+            IconButton(
+                modifier = Modifier.align(Alignment.BottomStart),
+                onClick = {
+                    navController.navigate("settings")
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "Settings"
+                )
             }
-        ) {
             Icon(
-                imageVector = Icons.Default.Settings,
-                contentDescription = "Settings"
+                painter = painterResource(id = R.drawable.baseline_add_24),
+                contentDescription = stringResource(id = R.string.add_sticky),
+                modifier = Modifier.clickable {
+                    stickyViewModel.onShowEditStickyDialog()
+                }
             )
         }
-        Icon(
-            painter = painterResource(id = R.drawable.baseline_add_24),
-            contentDescription = stringResource(id = R.string.add_sticky),
-            modifier = Modifier.clickable {
-                stickyViewModel.onShowEditStickyDialog()
-            }
-        )
     }
 
     if(stickyViewModel.showStickyEditScreen) {

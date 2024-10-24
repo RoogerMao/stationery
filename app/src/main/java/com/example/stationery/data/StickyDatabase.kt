@@ -7,7 +7,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(entities = [Sticky::class], version = 1, exportSchema = false)
+@Database(entities = [Sticky::class], version = 2, exportSchema = false)
 @TypeConverters(StickyConverters::class)
 abstract class StickyDatabase: RoomDatabase() {
     abstract fun stickyDAO(): StickyDAO
@@ -22,6 +22,7 @@ abstract class StickyDatabase: RoomDatabase() {
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(context, StickyDatabase::class.java, "sticky_database")
                     .addTypeConverter(stickyConverters)
+                    .fallbackToDestructiveMigration()
                     .build().also {
                         Instance = it
                     }

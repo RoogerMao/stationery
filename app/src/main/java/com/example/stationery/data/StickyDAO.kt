@@ -23,5 +23,8 @@ interface StickyDAO {
     @Query("SELECT * from stickies ORDER BY date ASC")
     fun getAllStickies(): Flow<List<Sticky>>
 
+    @Query("SELECT * FROM stickies WHERE title LIKE '%' || :searchQuery || '%' ORDER BY date ASC") //search query is a string
+    fun searchStickies(searchQuery: String): Flow<List<Sticky>>
+
     //TO ADD MORE
 }

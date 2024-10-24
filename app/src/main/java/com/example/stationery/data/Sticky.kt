@@ -38,7 +38,7 @@ data class StickyDetails(
 @Entity(tableName = "stickies")
 @TypeConverters(StickyConverters::class)
 data class Sticky(
-    @PrimaryKey val id: Long = 0,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val title: String = "",
     val date: String,
     val field: String,

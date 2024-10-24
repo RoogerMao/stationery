@@ -5,6 +5,9 @@ import kotlinx.coroutines.flow.Flow
 class OfflineStickiesRepository(private val stickyDAO: StickyDAO) : StickiesRepository {
     override fun getAllStickiesStream(): Flow<List<Sticky>> = stickyDAO.getAllStickies()
 
+    override fun searchStickiesStream(searchQuery: String): Flow<List<Sticky>> =
+        stickyDAO.searchStickies(searchQuery)
+
     override suspend fun insertSticky(sticky: Sticky) = stickyDAO.insert(sticky)
 
     override suspend fun deleteSticky(sticky: Sticky) = stickyDAO.delete(sticky)
@@ -14,6 +17,8 @@ class OfflineStickiesRepository(private val stickyDAO: StickyDAO) : StickiesRepo
 
 interface StickiesRepository {
     fun getAllStickiesStream(): Flow<List<Sticky>>
+
+    fun searchStickiesStream(searchQuery: String): Flow<List<Sticky>>
 
     suspend fun insertSticky(sticky: Sticky)
 

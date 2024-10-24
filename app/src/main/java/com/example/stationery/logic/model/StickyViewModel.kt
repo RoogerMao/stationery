@@ -34,14 +34,30 @@ class StickyViewModel(
     private val stickyRepository: StickiesRepository,
     private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery = _searchQuery.asStateFlow()
+
     // for showing stickies in the lazy column
-    val stickesUIStateFlow: StateFlow<StickiesUIState> = stickyRepository.getAllStickiesStream().map {
-            StickiesUIState(it)
-        }.stateIn(
+    val stickesUIStateFlow: StateFlow<StickiesUIState> = _searchQuery
+        .debounce(300L) // delay to stop overflow
+        .combine(stickyRepository.getAllStickiesStream()) { query, allStickies ->
+            if (query.isEmpty()) {
+                StickiesUIState(allStickies)
+            } else {
+                StickiesUIState(allStickies.filter {
+                    it.title.contains(query, ignoreCase = true)
+                })
+            }
+        }
+        .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
             initialValue = StickiesUIState()
         )
+
+    fun updateSearchQuery(query: String) { // update the search query
+        _searchQuery.value = query
+    }
 
     // for creating stickies
     private val _stickyUIState = MutableStateFlow(StickyUIState())
@@ -88,6 +104,7 @@ class StickyViewModel(
     suspend fun saveSticky() {
         if(validateStickyDetails()) {
             stickyRepository.insertSticky(stickyUIState.value.stickyDetails.toSticky())
+            _stickyUIState.update { currentState -> currentState.copy(stickyDetails = StickyDetails()) }
         }
     }
 
