@@ -93,7 +93,7 @@ fun HomeScreen(
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
-                              },
+               },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Search,
@@ -135,7 +135,13 @@ fun HomeScreen(
             ) {
                 items(items = stickiesUIState.stickyList) { stickyUIState ->
                     StickyCard(
-                        stickyUIState.toStickyDetails()
+                        stickyDetails = stickyUIState.toStickyDetails(),
+                        onDeleteSticky = {
+                            // ADD HERE
+                            coroutineScope.launch {
+                                stickyViewModel.deleteSticky()
+                            }
+                        }
                     )
                 }
             }

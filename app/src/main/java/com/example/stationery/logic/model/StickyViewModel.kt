@@ -69,6 +69,10 @@ class StickyViewModel(
         }
     }
 
+    suspend fun deleteSticky() {
+        stickyRepository.deleteSticky(stickyUIState.value.stickyDetails.toSticky())
+    }
+
     private fun validateStickyDetails(stickyDetails: StickyDetails = stickyUIState.value.stickyDetails): Boolean {
         return (stickyDetails.title != "")
     }
