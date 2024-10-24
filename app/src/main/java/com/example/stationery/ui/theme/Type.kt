@@ -1,5 +1,6 @@
 package com.example.stationery.ui.theme
 
+import android.annotation.SuppressLint
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -10,6 +11,7 @@ import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.text.googlefonts.Font
 import com.example.stationery.R
 
+@SuppressLint("ResourceType")
 val provider = GoogleFont.Provider(
     providerAuthority = "com.google.android.gms.fonts",
     providerPackage = "com.google.android.gms",
@@ -33,7 +35,7 @@ val displayFontFamily = FontFamily(
 // Default Material 3 typography values
 val baseline = Typography()
 
-val AppTypography = Typography(
+val StationeryTypography = Typography(
     displayLarge = baseline.displayLarge.copy(fontFamily = displayFontFamily),
     displayMedium = baseline.displayMedium.copy(fontFamily = displayFontFamily),
     displaySmall = baseline.displaySmall.copy(fontFamily = displayFontFamily),

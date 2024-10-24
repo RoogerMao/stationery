@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -34,6 +36,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -58,19 +62,20 @@ fun StickyDateSetting(
     ){
         Icon(
             painter = painterResource(painterResourceID),
-            contentDescription = "Edit $settingName"
+            contentDescription = "Edit $settingName",
+            tint = MaterialTheme.colorScheme.tertiary
         )
         Spacer(
             modifier = Modifier.width(8.dp)
         )
         Text( // make this bolded, do that with material theming later
-            text = settingName
-        )
-        Spacer(
-            modifier = Modifier.width(8.dp)
+            text = "$settingName: ",
+            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.bodyLarge
         )
         Text(
             text = settingValue,
+            style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.clickable (
                 onClick = onSettingValueClicked
             )
@@ -99,23 +104,16 @@ fun StickyDropdownSetting(
     ){
         Icon(
             painter = painterResource(painterResourceID),
-            contentDescription = "Edit $settingName"
+            contentDescription = "Edit $settingName",
+            tint = MaterialTheme.colorScheme.tertiary
         )
         Spacer(
             modifier = Modifier.width(8.dp)
         )
         Text( // make this bolded, do that with material theming later
-            text = settingName
-        )
-        Spacer(
-            modifier = Modifier.width(8.dp)
-        )
-        Icon(
-            painter = painterResource(settingValueIconID),
-            contentDescription = settingValue
-        )
-        Spacer(
-            modifier = Modifier.width(8.dp)
+            text = "$settingName: ",
+            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.bodyLarge
         )
         StickySettingDropdownMenu(
             text = settingValue,
@@ -149,6 +147,7 @@ fun StickySettingDropdownMenu(
 
     Text(
         text = text,
+        style = MaterialTheme.typography.bodyLarge,
         modifier = Modifier
             .onSizeChanged {
                 itemHeight = with(density) { it.height.toDp() }
@@ -174,15 +173,22 @@ fun StickySettingDropdownMenu(
         onDismissRequest = onDismissDropdown,
         offset = pressOffset.copy(
             y = pressOffset.y - itemHeight
-        )
+        ),
+        containerColor = MaterialTheme.colorScheme.tertiaryContainer
     ) {
         dropdownOptions.forEach { option ->
             DropdownMenuItem(
-                text = { Text(text = option.first) },
+                text = {
+                    Text(
+                        text = option.first,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+               },
                 leadingIcon = {
                     Icon(
                         painter = painterResource(option.second),
-                        contentDescription = option.first
+                        contentDescription = option.first,
+                        tint = MaterialTheme.colorScheme.tertiary
                     )
                 },
                 onClick = {
@@ -218,20 +224,21 @@ fun StickyFieldSetting(
         ){
             Icon(
                 painter = painterResource(painterResourceID),
-                contentDescription = "Edit $settingName"
+                contentDescription = "Edit $settingName",
+                tint = MaterialTheme.colorScheme.tertiary
             )
             Spacer(
                 modifier = Modifier.width(8.dp)
             )
             Text( // make this bolded, do that with material theming later
-                text = settingName
-            )
-            Spacer(
-                modifier = Modifier.width(8.dp)
+                text = "$settingName: ",
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.bodyLarge
             )
             Text(
                 text = settingValue,
                 maxLines = 1,
+                style = MaterialTheme.typography.bodyLarge,
                 overflow = TextOverflow.Ellipsis
             )
         }
@@ -262,26 +269,27 @@ fun StickyCareerSearchBar(
     modifier: Modifier = Modifier,
 ) {
     var expandedMenu by remember { mutableStateOf(false) }
-    val stickyUIState by settingValueFlow.collectAsState()
 
-    TextField(
+    OutlinedTextField(
         value = careerSearchQuery,
         onValueChange = {
             onCareerSearchQueryChange(it)
         },
-        trailingIcon = {
+        leadingIcon = {
             Icon(
                 painter = painterResource(id = R.drawable.baseline_search_24),
                 contentDescription = "Search",
                 modifier = Modifier.clickable {
                     onCareerSearchQueryDone()
                     expandedMenu = true
-                }
+                },
+                tint = MaterialTheme.colorScheme.tertiary
             )
         },
         placeholder = {
             Text(text = "Search Career List Here")
-        }
+        },
+        modifier = Modifier.padding(start = 8.dp)
     )
 
     DropdownMenu(

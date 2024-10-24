@@ -4,23 +4,30 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Button
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Switch
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -29,7 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -53,60 +60,87 @@ fun UserSettingsScreen(
     navController: NavHostController
 ) {
     val userSettingsUIState by userSettingsViewModel.userSettingsUIState.collectAsState()
-    Column (
-        modifier = modifier.fillMaxSize()
+    Box (
+        modifier = Modifier.padding(16.dp)
     ) {
-        UserProfile(
-            userSettingsViewModel = userSettingsViewModel,
-            username = userSettingsUIState.username
-        )
-        UserSettingsSwitches(
-            displaySummaries = userSettingsUIState.displaySummaries,
-            toggleDisplaySummaries = { userSettingsViewModel.toggleSummaryDisplay() },
-            displayInsights = userSettingsUIState.displayInsights,
-            toggleDisplayInsights = { userSettingsViewModel.toggleInsightDisplay() }
-        )
-    }
-    Icon(
-        painter = painterResource(id = R.drawable.baseline_arrow_back_24),
-        contentDescription = "Return to Homescreen",
-        modifier = Modifier.padding(8.dp)
-            .clickable(
+        Column(
+            modifier = modifier.fillMaxSize()
+        ) {
+            UserProfile(
+                userSettingsViewModel = userSettingsViewModel,
+                username = userSettingsUIState.username
+            )
+        }
+
+        IconButton(
             onClick = {
                 navController.navigate("home")
-            }
-        )
-    )
+            },
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .height(64.dp)
+                .width(64.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.primary,
+                    shape = CircleShape
+                )
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_arrow_back_24),
+                contentDescription = "Return to Home Screen",
+                tint = MaterialTheme.colorScheme.onPrimary
+            )
+        }
+    }
 
     if(userSettingsViewModel.showEditUsernameDialog) {
         Dialog(
             onDismissRequest = { userSettingsViewModel.onDismissEditUsernameDialog() }
         ) {
-            Card {
-                Column {
-                    TextField(
+            Card (
+                colors = CardColors(
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                    disabledContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    disabledContentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                )
+            ) {
+                Column (
+                    modifier = Modifier.padding(8.dp)
+                ){
+                    OutlinedTextField(
                         value = userSettingsUIState.newUsername,
                         onValueChange = { userSettingsViewModel.editNewUsername(it) },
                         label = {
                             Text(
-                                text = stringResource(id = R.string.edit_username)
+                                text = stringResource(id = R.string.edit_username),
+                                style = MaterialTheme.typography.bodyLarge
                             )
-                        }
+                        },
+                        modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth()
                     )
                     Row (
                         horizontalArrangement = Arrangement.SpaceBetween
                     ){
-                        Button(
+                        TextButton(
                             onClick = { userSettingsViewModel.onDismissEditUsernameDialog() },
                             content = {
-                                Text(text = "Dismiss")
-                            }
+                                Text(
+                                    text = "Dismiss",
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                            },
+                            modifier = Modifier.weight(1F)
                         )
-                        Button(
+                        TextButton(
                             onClick = { userSettingsViewModel.onConfirmEditUsernameDialog(userSettingsUIState.newUsername) },
                             content = {
-                                Text(text = "Confirm")
-                            }
+                                Text(
+                                    text = "Confirm",
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                            },
+                            modifier = Modifier.weight(1F)
                         )
                     }
                 }
@@ -135,35 +169,46 @@ fun UserProfile(
         modifier = Modifier.fillMaxWidth()
     ) {
 
-        LazyColumn {
-            item {
-                AsyncImage(
-                    model = selectedImageUri ?: defaultImageUri,
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxWidth(),
-                    contentScale = ContentScale.Crop
-                )
+        Box {
+            LazyColumn {
+                item {
+                    AsyncImage(
+                        model = selectedImageUri ?: defaultImageUri,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp))
+                            .padding(16.dp),
+                        contentScale = ContentScale.Crop
+                    )
+                }
             }
-        }
-        Row (
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Button (
+
+            IconButton(
                 onClick = {
                     singlePhotoPickerLauncher.launch(
                         PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                     )
                     userSettingsViewModel.updateProfileImage(newImageId = selectedImageUri)
                 },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .height(64.dp)
+                    .width(64.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                        shape = RoundedCornerShape(16.dp)
+                    )
             ) {
-                Text(
-                    text = "Change Profile Photo",
-                    textAlign = TextAlign.Center
+                Icon(
+                    painter = painterResource(R.drawable.baseline_image_24),
+                    contentDescription = "Settings",
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.width(48.dp)
                 )
             }
         }
+
+
         Row (
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
@@ -171,64 +216,27 @@ fun UserProfile(
         ){
             Text(
                 text = username,
+                style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center
             )
             Spacer(
-                modifier = Modifier.width(8.dp)
+                modifier = Modifier.width(16.dp)
             )
             Icon(
                 painter = painterResource(id = R.drawable.baseline_edit_24),
                 contentDescription = stringResource(id = R.string.edit_username),
-                tint = Color.Black,
-                modifier = Modifier.clickable(
+                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                modifier = Modifier
+                    .width(32.dp)
+                    .height(32.dp)
+                    .background(color = MaterialTheme.colorScheme.primaryContainer, shape = RoundedCornerShape(8.dp))
+                    .clickable(
                     onClick = {
                         userSettingsViewModel.onShowEditUsernameDialog()
                     }
                 )
             )
         }
-    }
-}
-
-@Composable
-fun SwitchSetting(
-    label: String,
-    value: Boolean,
-    toggleFunction: () -> Unit
-) {
-    Row (
-        horizontalArrangement = Arrangement.Absolute.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Text(
-            text = label
-        )
-        Switch(
-            checked = value,
-            onCheckedChange = { toggleFunction() }
-        )
-    }
-}
-
-@Composable
-fun UserSettingsSwitches(
-    displayInsights: Boolean,
-    toggleDisplayInsights: () -> Unit,
-    displaySummaries: Boolean,
-    toggleDisplaySummaries: () -> Unit
-) {
-    Column {
-        SwitchSetting(
-            label = stringResource(id = R.string.toggle_insights_label),
-            value = displayInsights,
-            toggleFunction =  { toggleDisplayInsights() }
-        )
-        SwitchSetting(
-            label = stringResource(id = R.string.toggle_summaries_label),
-            value = displaySummaries,
-            toggleFunction = { toggleDisplaySummaries() }
-        )
     }
 }
 

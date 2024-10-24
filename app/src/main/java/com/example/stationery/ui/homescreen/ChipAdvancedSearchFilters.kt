@@ -1,11 +1,15 @@
 package com.example.stationery.ui.homescreen
 
 import android.util.Log
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SelectableChipColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -90,7 +94,12 @@ fun AdvancedSearchChip(
 
     FilterChip(
         onClick = { toggleSelection(index) },
-        label = { Text(text = searchLabel) },
+        label = {
+            Text(
+                text = searchLabel,
+                style = MaterialTheme.typography.labelLarge
+            )
+        },
         selected = selected,
         enabled = enabled,
         leadingIcon = if (selected) {
@@ -100,6 +109,24 @@ fun AdvancedSearchChip(
                     contentDescription = "Advanced searching using $searchLabel"
                 )
             }
-        } else null
+        } else null,
+        border = BorderStroke(2.dp, MaterialTheme.colorScheme.outline),
+        shape = RoundedCornerShape(8.dp),
+        colors = SelectableChipColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            labelColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            leadingIconColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            trailingIconColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            selectedContainerColor = MaterialTheme.colorScheme.secondary,
+            disabledSelectedContainerColor = MaterialTheme.colorScheme.secondary,
+            selectedLabelColor = MaterialTheme.colorScheme.onSecondary,
+            selectedLeadingIconColor = MaterialTheme.colorScheme.onSecondary,
+            selectedTrailingIconColor = MaterialTheme.colorScheme.onSecondary
+        ),
+        modifier = Modifier.animateContentSize()
     )
 }

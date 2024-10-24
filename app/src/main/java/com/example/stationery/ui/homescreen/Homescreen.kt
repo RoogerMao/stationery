@@ -1,6 +1,6 @@
 package com.example.stationery.ui.homescreen
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,23 +9,26 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -76,41 +79,36 @@ fun HomeScreen(
     val stickySearchQuery by searchViewModel.stickySearchQuery.collectAsState()
 
     Column(
-        modifier = Modifier.padding(8.dp)
+        modifier = Modifier.padding(16.dp)
     ) {
         Row {
-            TextField(
+            OutlinedTextField(
                 value = stickySearchQuery,
                 onValueChange = { searchViewModel.updateStickySearchQuery(it) },
                 modifier = Modifier
                     .weight(1F),
-                placeholder = { Text("Search sticky notes...") },
+                placeholder = {
+                    Text(
+                        text = "Search sticky notes...",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                              },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Search,
-                        contentDescription = "Search"
+                        contentDescription = "Search",
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 },
                 singleLine = true,
                 shape = MaterialTheme.shapes.medium,
                 colors = TextFieldDefaults.colors(
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
-                )
+                    unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedContainerColor = MaterialTheme.colorScheme.primaryContainer
+                ),
+                textStyle = MaterialTheme.typography.labelLarge
             )
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            IconButton(
-                onClick = {
-                    navController.navigate("settings")
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Settings,
-                    contentDescription = "Settings"
-                )
-            }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -126,19 +124,59 @@ fun HomeScreen(
         ) {
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxSize()
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceContainer,
+                        shape = RoundedCornerShape(16.dp)
+                    ),
+                contentPadding = PaddingValues(8.dp)
             ) {
                 items(items = stickiesUIState.stickyList) { stickyUIState ->
-                    StickyCard(stickyUIState.toStickyDetails())
+                    StickyCard(
+                        stickyUIState.toStickyDetails()
+                    )
                 }
             }
-            Icon(
-                painter = painterResource(id = R.drawable.baseline_add_24),
-                contentDescription = stringResource(id = R.string.add_sticky),
-                modifier = Modifier.clickable {
-                    stickyViewModel.onShowEditStickyDialog()
-                }
-            )
+
+            IconButton(
+                onClick = { stickyViewModel.onShowEditStickyDialog() },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .height(64.dp)
+                    .width(64.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                        shape = CircleShape
+                    )
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_add_24),
+                    contentDescription = stringResource(id = R.string.add_sticky),
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
+
+            IconButton(
+                onClick = {
+                    navController.navigate("settings")
+                },
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .height(64.dp)
+                    .width(64.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = CircleShape
+                    )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "Settings",
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+            }
         }
     }
 
@@ -198,14 +236,21 @@ fun EditStickyDialog(
     val focusManager= LocalFocusManager.current
 
     Dialog(
-        onDismissRequest = onDismiss
+        onDismissRequest = onDismiss,
     ) {
-        Card {
+        Card (
+            colors = CardColors(
+                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                disabledContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                disabledContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+            )
+        ) {
             Column(
                 modifier = Modifier.padding(8.dp)
             ) {
                 // enter name of activity
-                TextField(
+                OutlinedTextField(
                     value = stickyUIState.stickyDetails.title,
                     onValueChange = {
                         onValueChange(stickyUIState.stickyDetails.copy(title = it)) },
@@ -222,6 +267,10 @@ fun EditStickyDialog(
                         onNext = {
                             focusManager.moveFocus(FocusDirection.Next)
                         }
+                    ),
+                    colors = TextFieldDefaults.colors(
+                        unfocusedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                        focusedContainerColor = MaterialTheme.colorScheme.tertiaryContainer
                     ),
                     modifier = Modifier.padding(bottom = 8.dp, start = 8.dp)
                 )
@@ -332,7 +381,7 @@ fun EditStickyDialog(
                 )
 
                 // enter time committed
-                TextField(
+                OutlinedTextField(
                     value = stickyUIState.stickyDetails.timeCommitted,
                     onValueChange = {
                         onValueChange(stickyUIState.stickyDetails.copy(timeCommitted = it))
@@ -353,13 +402,21 @@ fun EditStickyDialog(
                     TextButton(
                         onClick = onDismiss,
                         content = {
-                            Text(text = "Dismiss")
+                            Text(
+                                text = "Dismiss",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
                         },
                         modifier = Modifier.weight(1F)
                     )
                     TextButton(
                         onClick = onSave,
-                        content = { Text(text = "Save") },
+                        content = {
+                            Text(
+                                text = "Save",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                        },
                         modifier = Modifier.weight(1F)
                     )
                 }
